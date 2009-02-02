@@ -258,6 +258,7 @@ fonts.enc.math["traditional-mr"] = {
     [0x002C7] = 0x14, -- [math]check
     [0x002D8] = 0x15, -- [math]breve
     [0x000AF] = 0x16, -- [math]bar
+    [0x002DA] = 0x17, -- [math]ring
     [0x00021] = 0x21, -- !
     [0x00028] = 0x28, -- (
     [0x00029] = 0x29, -- )
