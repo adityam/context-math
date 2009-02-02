@@ -9,288 +9,6 @@ if not modules then modules = { } end modules ['math-ini'] = {
 -- if needed we can use the info here to set up xetex definition files
 -- the "8000 hackery influences direct characters (utf) as indirect \char's
 
---~ % \definemathcharacter [(]   [nothing] [mr] ["28] [ex] ["00]
---~ % \definemathcharacter [)]   [nothing] [mr] ["29] [ex] ["01]
---~ % \definemathcharacter [91]  [nothing] [mr] ["5B] [ex] ["02] % [
---~ % \definemathcharacter [93]  [nothing] [mr] ["5D] [ex] ["03] % ]
---~ % \definemathcharacter [<]   [nothing] [sy] ["68] [ex] ["0A]
---~ % \definemathcharacter [>]   [nothing] [sy] ["69] [ex] ["0B]
---~ % \definemathcharacter [/]   [nothing] [mr] ["2F] [ex] ["0E]
---~ % \definemathcharacter [124] [nothing] [sy] ["6A] [ex] ["0C] % |
---~ % \definemathcharacter [92]  [nothing] [sy] ["6E] [ex] ["0F] % \
-
---~ % \definemathsymbol [lmoustache]  [open]    [ex] ["7A] [ex] ["40]
---~ % \definemathsymbol [rmoustache]  [close]   [ex] ["7B] [ex] ["41]
---~ % \show\lgroup]      [open]    [mr] ["28] [ex] ["3A] % ?
---~ % \show\rgroup]      [close]   [mr] ["29] [ex] ["3B] % ?
---~ % \definemathsymbol [arrowvert]   [nothing] [sy] ["6A] [ex] ["3C]
---~ % \definemathsymbol [Arrowvert]   [nothing] [sy] ["6B] [ex] ["3D]
---~ % \definemathsymbol [bracevert]   [nothing] [ex] ["3E] % ?
---~ % \definemathsymbol [Vert]        [nothing] [sy] ["6B] [ex] ["0D]
---~ % \definemathsymbol [vert]        [nothing] [sy] ["6A] [ex] ["0C]
---~ % \definemathsymbol [uparrow]     [rel]     [sy] ["22] [ex] ["78]
---~ % \definemathsymbol [downarrow]   [rel]     [sy] ["23] [ex] ["79]
---~ % \definemathsymbol [updownarrow] [rel]     [sy] ["6C] [ex] ["3F]
---~ % \definemathsymbol [Uparrow]     [rel]     [sy] ["2A] [ex] ["7E]
---~ % \definemathsymbol [Downarrow]   [rel]     [sy] ["2B] [ex] ["7F]
---~ % \definemathsymbol [Updownarrow] [rel]     [sy] ["6D] [ex] ["77]
---~ % \definemathsymbol [backslash]   [nothing] [sy] ["6E] [ex] ["0F]
---~ % \definemathsymbol [langle]      [open]    [sy] ["68] [ex] ["0A]
---~ % \definemathsymbol [rangle]      [close]   [sy] ["69] [ex] ["0B]
---~ % \definemathsymbol [lbrace]      [open]    [sy] ["66] [ex] ["08]
---~ % \definemathsymbol [rbrace]      [close]   [sy] ["67] [ex] ["09]
---~ % \definemathsymbol [lceil]       [open]    [sy] ["64] [ex] ["06]
---~ % \definemathsymbol [rceil]       [close]   [sy] ["65] [ex] ["07]
---~ % \definemathsymbol [lfloor]      [open]    [sy] ["62] [ex] ["04]
---~ % \definemathsymbol [rfloor]      [close]   [sy] ["63] [ex] ["05]
---~ % \definemathsymbol [sqrt]        [radical] [sy] ["70] [ex] ["70]
---~ % \definemathsymbol [lvert]       [open]    [sy] ["6A] [ex] ["0C]
---~ % \definemathsymbol [rvert]       [close]   [sy] ["6A] [ex] ["0C]
---~ % \definemathsymbol [lVert]       [open]    [sy] ["6B] [ex] ["0D]
---~ % \definemathsymbol [rVert]       [close]   [sy] ["6B] [ex] ["0D]
-
---~ ell
---~ wp
---~ Re
---~ Im
---~ partial
---~ emptyset
---~ nabla
---~ top
---~ bot
---~ triangle          ord
---~ neg               ord
---~ flat              ord
---~ natural           ord
---~ sharp             ord
---~ clubsuit          ord
---~ diamondsuit       ord
---~ heartsuit         ord
---~ spadesuit         ord
---~ coprod            op
---~ bigvee            op
---~ bigwedge          op
---~ biguplus          op
---~ bigcap            op
---~ bigcup            op
---~ intop             op
---~ prod              op
---~ sum               op
---~ bigotimes         op
---~ bigoplus          op
---~ bigodot           op
---~ ointop            op
---~ bigsqcup          op
---~ smallint          op
---~ bigtriangleup     bin
---~ bigtriangledown   bin
---~ wedge             bin
---~ vee               bin
---~ cap               bin
---~ cup               bin
---~ ddagger           bin
---~ dagger            bin
---~ sqcap             bin
---~ sqcup             bin
---~ uplus             bin
---~ amalg             bin
---~ diamond           bin
---~ wr                bin
---~ div               bin
---~ odot              bin
---~ mp                bin
---~ pm                bin
---~ circ              bin
---~ bigcirc           bin
---~ setminus          bin
---~ cdot              bin
---~ ast               bin
---~ star              bin
---~ propto            rel
---~ sqsubseteq        rel
---~ sqsupseteq        rel
---~ mid               rel
---~ dashv             rel
---~ vdash             rel
---~ lnot              {\neg}
---~ int               {\intop \intlimits}
---~ oint              {\ointop\intlimits}
---~ land              {\wedge}
---~ lor               {\vee}
---~ neq               {\not=}
---~ ne                {\neq}
---~ le                {\leq}
---~ ge                {\geq}
---~ eq                {=}
---~ gt                {>}
---~ lt                {<}
---~ gets              {\leftarrow}
---~ owns              {\ni}
---~ to                {\rightarrow}
---~ mapsto            {\mapstochar\rightarrow}
---~ leq               rel
---~ geq               rel
---~ succ              rel
---~ prec              rel
---~ supset            rel
---~ subset            rel
---~ supseteq          rel
---~ subseteq          rel
---~ in                rel
---~ ni                rel
---~ gg                rel
---~ ll                rel
---~ not               rel
---~ mapstochar        rel
---~ sim               rel
---~ simeq             rel
---~ perp              rel
---~ asymp             rel
---~ smile
---~ frown
---~ leftharpoonup     rel
---~ leftharpoondown   rel
---~ rightharpoonup    rel
---~ rightharpoondown  rel
---~ lhook             rel
---~ rhook             rel
---~ hbar              {{\mathchar'26\mkern-9muh}}
---~ surd              {{\mathchar"1270}}          % ?
---~ angle             {\PLAINangle}
---~ square            {\hbox{\hsmash{$\sqcup$}$\sqcap$}}
---~ hookrightarrow    {\lhook\joinrel\rightarrow}
---~ hookleftarrow     {\leftarrow\joinrel\rhook}
---~ bowtie            {\mathrel\triangleright\joinrel\mathrel\triangleleft}
---~ models            {\mathrel|\joinrel=}
---~ iff               {\;\Longleftrightarrow\;}
---~ ldotp             punct
---~ cdotp             punct
---~ colon             punct
---~ ldots             inner    {\PLAINldots}
---~ cdots             inner    {\PLAINcdots}
---~ vdots             nothing  {\PLAINvdots}
---~ ddots             inner    {\PLAINddots}
---~ acute             accent
---~ grave             accent
---~ ddot              accent
---~ tilde             accent
---~ mathring          accent
---~ bar               accent
---~ breve             accent
---~ check             accent
---~ hat               accent
---~ vec               accent
---~ dot               accent
---~ widetilde         accent
---~ widehat           accent
---~ lmoustache        open
---~ rmoustache        close
---~ lgroup            open
---~ rgroup            close
---~ arrowvert         ex "3C
---~ Arrowvert         ex "3D
---~ bracevert         ex "3E
---~ Vert              ex -> "0D
---~ vert              ex -> "0C
---~ backslash         nothing (ook ex)
---~ langle            open
---~ rangle            close
---~ sqrt              radical
---~ lvert             open
---~ rvert             close
---~ lVert             open
---~ rVert             close
-
---~ 0x033B -> square Box
---~ 0x2035 -> backprime
---~ 0x2132 -> Finv
---~ 0x2136 -> beth
---~ 0x2137 -> gimel
---~ 0x2138 -> daleth
---~ 0x2141 -> Game
---~ 0x21B0 -> Lsh
---~ 0x21B1 -> Rsh
---~ 0x21DD -> leadsto rightsquigarrow
---~ 0x2201 -> complement
---~ 0x2205 -> varnothing
---~ 0x2208 -> in
---~ 0x2216 -> smallsetminus
---~ 0x2224 -> nmid
---~ 0x2226 -> nparallel
---~ 0x2234 -> therefore
---~ 0x2235 -> because
---~ 0x223D -> backsim
---~ 0x2241 -> nsim
---~ 0x2242 -> eqsim
---~ 0x2247 -> ncong
---~ 0x224E -> Bumpeq
---~ 0x224F -> bumpeq
---~ 0x2251 -> Doteq doteqdot
---~ 0x2252 -> fallingdotseq
---~ 0x2253 -> risingdotseq
---~ 0x2256 -> eqcirc
---~ 0x2257 -> circeq
---~ 0x226C -> between
---~ 0x22A4 -> bop
---~ 0x22A8 -> vDash
---~ 0x22A9 -> Vdash
---~ 0x22AA -> Vvdash
---~ 0x22AC -> nvdash
---~ 0x22AD -> nvDash
---~ 0x22AE -> nVdash
---~ 0x22AF -> nVDash
---~ 0x22B2 -> lhd vartriangleleft
---~ 0x22B3 -> rhd vartriangleright
---~ 0x22B4 -> unlhd trianglelefteq
---~ 0x22B5 -> unrhd trianglerighteq
---~ 0x22B8 -> multimap
---~ 0x22BA -> intercal
---~ 0x22BB -> veebar
---~ 0x22BC -> barwedge
---~ 0x22C4 -> Diamond lozenge
---~ 0x22C7 -> divideontimes
---~ 0x22C9 -> ltimes
---~ 0x22CA -> rtimes
---~ 0x22CB -> leftthreetimes
---~ 0x22CC -> rightthreetimes
---~ 0x22CD -> backsimeq
---~ 0x22CE -> curlyvee
---~ 0x22CF -> curlywedge
---~ 0x22D1 -> Supset
---~ 0x22D3 -> doublecup Cup
---~ 0x22D4 -> pitchfork
---~ 0x22D6 -> lessdot
---~ 0x22D7 -> gtrdot
---~ 0x22D8 -> lll llless
---~ 0x22D9 -> ggg gggtr
---~ 0x22DA -> lesseqgtr
---~ 0x22DB -> gtreqless
---~ 0x22DE -> curlyeqprec
---~ 0x22DF -> curlyeqsucc
---~ 0x22E6 -> lnsim
---~ 0x22E7 -> gnsim
---~ 0x22E8 -> precnsim
---~ 0x22E9 -> succnsim
---~ 0x22EA -> ntriangleleft
---~ 0x22EB -> ntriangleright
---~ 0x22EC -> ntrianglelefteq
---~ 0x22ED -> ntrianglerighteq
---~ 0x2306 -> doublebarwedge
---~ 0x231C -> ulcorner
---~ 0x231D -> urcorner
---~ 0x231E -> llcorner
---~ 0x231F -> lrcorner
---~ 0x24C8 -> circledS
---~ 0x25A0 -> blacksquare ord
---~ 0x25B2 -> blacktriangle
---~ 0x25B3 -> triangle up
---~ 0x25B6 -> blacktriangleright rel
---~ 0x25BC -> triangledown
---~ 0x25C0 -> blacktriangleleft rel
---~ 0x2605 -> bigstar
---~ 0x29EB -> blacklozenge
---~ 0x1D55C -> Bbbk
-
 local texsprint, format, utfchar, utfbyte = tex.sprint, string.format, utf.char, utf.byte
 
 local trace_defining = false  trackers.register("math.defining", function(v) trace_defining = v end)
@@ -345,22 +63,23 @@ local families = {
 }
 
 local classes = {
-    ord     = 0,  -- mathordcomm     mathord
-    op      = 1,  -- mathopcomm      mathop
-    bin     = 2,  -- mathbincomm     mathbin
-    rel     = 3,  -- mathrelcomm     mathrel
-    open    = 4,  -- mathopencomm    mathopen
-    close   = 5,  -- mathclosecomm   mathclose
-    punct   = 6,  -- mathpunctcomm   mathpunct
-    alpha   = 7,  -- mathalphacomm   firstofoneargument
-    accent  = 8,
-    radical = 9,
-    inner   = 0,  -- mathinnercomm   mathinner
-    nothing = 0,  -- mathnothingcomm firstofoneargument
-    choice  = 0,  -- mathchoicecomm  @@mathchoicecomm
-    box     = 0,  -- mathboxcomm     @@mathboxcomm
-    limop   = 1,  -- mathlimopcomm   @@mathlimopcomm
-    nolop   = 1,  -- mathnolopcomm   @@mathnolopcomm
+    ord     =  0,  -- mathordcomm     mathord
+    op      =  1,  -- mathopcomm      mathop
+    bin     =  2,  -- mathbincomm     mathbin
+    rel     =  3,  -- mathrelcomm     mathrel
+    open    =  4,  -- mathopencomm    mathopen
+    close   =  5,  -- mathclosecomm   mathclose
+    punct   =  6,  -- mathpunctcomm   mathpunct
+    alpha   =  7,  -- mathalphacomm   firstofoneargument
+    accent  =  8,  -- class 0
+    radical =  9,
+    xaccent = 10,  -- class 3
+    inner   =  0,  -- mathinnercomm   mathinner
+    nothing =  0,  -- mathnothingcomm firstofoneargument
+    choice  =  0,  -- mathchoicecomm  @@mathchoicecomm
+    box     =  0,  -- mathboxcomm     @@mathboxcomm
+    limop   =  1,  -- mathlimopcomm   @@mathlimopcomm
+    nolop   =  1,  -- mathnolopcomm   @@mathnolopcomm
 }
 
 mathematics.families = families
@@ -393,6 +112,7 @@ local function mathchar(class,family,slot)
     return format('\\Umathchar "%X "%X "%X ',class,family,slot)
 end
 local function mathaccent(class,family,slot)
+    class = 0
     return format('\\Umathaccent "%X "%X "%X ',class,family,slot)
 end
 local function delimiter(class,family,slot)
