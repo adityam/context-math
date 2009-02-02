@@ -910,9 +910,9 @@ characters.data={
   description="CIRCUMFLEX ACCENT",
   direction="on",
   linebreak="al",
-  mathclass="accent",
-  mathname="hat",
-  mathstretch="h",
+--~   mathclass="accent",
+--~   mathname="hat", -- was widehat. why?
+--~   mathstretch="h",
   unicodeslot=0x005E,
  },
  {
@@ -1273,9 +1273,9 @@ characters.data={
   description="TILDE",
   direction="on",
   linebreak="al",
-  mathclass="accent",
-  mathname="widetilde",
-  mathstretch="h",
+--~   mathclass="accent",
+--~   mathname="tilde",
+--~   mathstretch="h",
   unicodeslot=0x007E,
  },
  {
@@ -7599,6 +7599,9 @@ characters.data={
   description="COMBINING CIRCUMFLEX ACCENT",
   direction="nsm",
   linebreak="cm",
+  mathclass="accent",
+  mathname="hat",
+  mathstretch="h",
   unicodeslot=0x0302,
  },
  {
@@ -7608,6 +7611,9 @@ characters.data={
   description="COMBINING TILDE",
   direction="nsm",
   linebreak="cm",
+  mathclass="accent",
+  mathname="tilde",
+  mathstretch="h",
   unicodeslot=0x0303,
  },
  {
@@ -52590,7 +52596,6 @@ characters.data={
   description="PARALLEL TO",
   direction="on",
   linebreak="ai",
-  mathclass="relation",
   mathspec={
    { class="relation", name="parallel" },
    { class="nothing", name="Vert" },
