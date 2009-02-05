@@ -7311,7 +7311,7 @@ characters.data={
   direction="on",
   linebreak="ai",
   mathclass="accent",
-  mathname="ring", 
+  mathname="mathring", 
   specials={ "compat", 0x0020, 0x030A },
   unicodeslot=0x02DA,
  },
