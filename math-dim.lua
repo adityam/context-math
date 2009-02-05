@@ -6,6 +6,9 @@ if not modules then modules = { } end modules ['math-dim'] = {
     license   = "see context related readme files"
 }
 
+-- Beware: only Taco really understands what these dimensions do so if you
+-- run into problems ...
+
 local abs, next = math.abs, next
 
 mathematics = mathematics or { }
@@ -20,6 +23,16 @@ local defaults = {
         ['script_script_style']={ "AxisHeight", "axis_height" },
         ['script_style']={ "AxisHeight", "axis_height" },
         ['text_style']={ "AxisHeight", "axis_height" },
+    },
+    ['accent_base_height']={
+        ['cramped_display_style']={ "AccentBaseHeight", "x_height" },
+        ['cramped_script_script_style']={ "AccentBaseHeight", "x_height" },
+        ['cramped_script_style']={ "AccentBaseHeight", "x_height" },
+        ['cramped_text_style']={ "AccentBaseHeight", "x_height" },
+        ['display_style']={ "AccentBaseHeight", "x_height" },
+        ['script_script_style']={ "AccentBaseHeight", "x_height" },
+        ['script_style']={ "AccentBaseHeight", "x_height" },
+        ['text_style']={ "AccentBaseHeight", "x_height" },
     },
     ['fraction_del_size']={
         ['cramped_display_style']={ "0", "delim1" },
@@ -52,24 +65,24 @@ local defaults = {
         ['text_style']={ "FractionDenominatorGapMin", "default_rule_thickness" },
      },
     ['fraction_num_up']={
-          ['cramped_display_style']={ "FractionNumeratorDisplayStyleShiftUp", "num1" },
-          ['cramped_script_script_style']={ "FractionNumeratorShiftUp", "num2" },
-          ['cramped_script_style']={ "FractionNumeratorShiftUp", "num2" },
-          ['cramped_text_style']={ "FractionNumeratorShiftUp", "num2" },
-          ['display_style']={ "FractionNumeratorDisplayStyleShiftUp", "num1" },
-          ['script_script_style']={ "FractionNumeratorShiftUp", "num2" },
-          ['script_style']={ "FractionNumeratorShiftUp", "num2" },
-          ['text_style']={ "FractionNumeratorShiftUp", "num2" },
+        ['cramped_display_style']={ "FractionNumeratorDisplayStyleShiftUp", "num1" },
+        ['cramped_script_script_style']={ "FractionNumeratorShiftUp", "num2" },
+        ['cramped_script_style']={ "FractionNumeratorShiftUp", "num2" },
+        ['cramped_text_style']={ "FractionNumeratorShiftUp", "num2" },
+        ['display_style']={ "FractionNumeratorDisplayStyleShiftUp", "num1" },
+        ['script_script_style']={ "FractionNumeratorShiftUp", "num2" },
+        ['script_style']={ "FractionNumeratorShiftUp", "num2" },
+        ['text_style']={ "FractionNumeratorShiftUp", "num2" },
      },
      ['fraction_num_vgap']={
-          ['cramped_display_style']={ "FractionNumeratorDisplayStyleGapMin", "3*default_rule_thickness" },
-          ['cramped_script_script_style']={ "FractionNumeratorGapMin", "default_rule_thickness" },
-          ['cramped_script_style']={ "FractionNumeratorGapMin", "default_rule_thickness" },
-          ['cramped_text_style']={ "FractionNumeratorGapMin", "default_rule_thickness" },
-          ['display_style']={ "FractionNumeratorDisplayStyleGapMin", "3*default_rule_thickness" },
-          ['script_script_style']={ "FractionNumeratorGapMin", "default_rule_thickness" },
-          ['script_style']={ "FractionNumeratorGapMin", "default_rule_thickness" },
-          ['text_style']={ "FractionNumeratorGapMin", "default_rule_thickness" },
+        ['cramped_display_style']={ "FractionNumeratorDisplayStyleGapMin", "3*default_rule_thickness" },
+        ['cramped_script_script_style']={ "FractionNumeratorGapMin", "default_rule_thickness" },
+        ['cramped_script_style']={ "FractionNumeratorGapMin", "default_rule_thickness" },
+        ['cramped_text_style']={ "FractionNumeratorGapMin", "default_rule_thickness" },
+        ['display_style']={ "FractionNumeratorDisplayStyleGapMin", "3*default_rule_thickness" },
+        ['script_script_style']={ "FractionNumeratorGapMin", "default_rule_thickness" },
+        ['script_style']={ "FractionNumeratorGapMin", "default_rule_thickness" },
+        ['text_style']={ "FractionNumeratorGapMin", "default_rule_thickness" },
      },
     ['fraction_rule']={
         ['cramped_display_style']={ "FractionRuleThickness", "default_rule_thickness" },
@@ -286,7 +299,7 @@ local defaults = {
         ['cramped_script_script_style']={ "SubscriptTopMax", "abs(math_x_height*4)/5" },
         ['cramped_script_style']={ "SubscriptTopMax", "abs(math_x_height*4)/5" },
         ['cramped_text_style']={ "SubscriptTopMax", "abs(math_x_height*4)/5" },
-        ['display_style']={ "SubscriptTopMax", "abs(math_x_height*4)/5)" },
+        ['display_style']={ "SubscriptTopMax", "abs(math_x_height*4)/5" },
         ['script_script_style']={ "SubscriptTopMax", "abs(math_x_height*4)/5" },
         ['script_style']={ "SubscriptTopMax", "abs(math_x_height*4)/5" },
         ['text_style']={ "SubscriptTopMax", "abs(math_x_height*4)/5" },
@@ -380,12 +393,14 @@ function mathematics.dimensions(dimens)
         local default_rule_thickness = dimens.FractionDenominatorGapMin or dimens.default_rule_thickness or 0.4*65526
         dimens["0"] = 0
         dimens["3*default_rule_thickness"] = 3*default_rule_thickness
+        dimens["4*default_rule_thickness"] = 4*default_rule_thickness
         dimens["7*default_rule_thickness"] = 7*default_rule_thickness
         dimens["abs(math_x_height*4)/5"] = abs(math_x_height * 4) / 5
         dimens["default_rule_thickness+(abs(math_x_height)/4)"] = default_rule_thickness+(abs(math_x_height)/4)
         dimens["abs(math_x_height)/4"] = abs(math_x_height)/4
         dimens["abs(math_x_height*4)/5"] = abs(math_x_height*4)/5
         dimens["<not set>"] = false
+        dimens["script_space"] = false -- at macro level
         for variable, styles in next, defaults do
             local tt = { }
             for style, default in next, styles do
@@ -405,14 +420,15 @@ function mathematics.dimensions(dimens)
             t[variable] = tt
         end
         local d = {
-            AxisHeight                                  = t . axis                . display_style,
+            AxisHeight                                  = t . axis                . text_style,
+            AccentBaseHeight                            = t . accent_base_height  . text_style,
             FractionDenominatorDisplayStyleGapMin       = t . fraction_denom_vgap . display_style,
             FractionDenominatorDisplayStyleShiftDown    = t . fraction_denom_down . display_style,
-            FractionDenominatorGapMin                   = t . fraction_denom_vgap . script_script_style,
+            FractionDenominatorGapMin                   = t . fraction_denom_vgap . text_style,
             FractionDenominatorShiftDown                = t . fraction_denom_down . text_style,
             FractionNumeratorDisplayStyleGapMin         = t . fraction_num_vgap   . display_style,
             FractionNumeratorDisplayStyleShiftUp        = t . fraction_num_up     . display_style,
-            FractionNumeratorGapMin                     = t . fraction_num_vgap   . display_style,
+            FractionNumeratorGapMin                     = t . fraction_num_vgap   . text_style,
             FractionNumeratorShiftUp                    = t . fraction_num_up     . text_style,
             FractionRuleThickness                       = t . fraction_rule       . text_style,
             LowerLimitBaselineDropMin                   = t . limit_below_bgap    . text_style,
@@ -420,7 +436,7 @@ function mathematics.dimensions(dimens)
             OverbarExtraAscender                        = t . overbar_kern        . text_style,
             OverbarRuleThickness                        = t . overbar_rule        . text_style,
             OverbarVerticalGap                          = t . overbar_vgap        . text_style,
-            RadicalDisplayStyleVerticalGap              = t . radical_vgap        . text_style,
+            RadicalDisplayStyleVerticalGap              = t . radical_vgap        . display_style,
             RadicalExtraAscender                        = t . radical_kern        . text_style,
             RadicalRuleThickness                        = t . radical_rule        . text_style,
             RadicalVerticalGap                          = t . radical_vgap        . text_style,
@@ -431,21 +447,22 @@ function mathematics.dimensions(dimens)
             StackGapMin                                 = t . stack_vgap          . text_style,
             StackTopDisplayStyleShiftUp                 = t . stack_num_up        . display_style,
             StackTopShiftUp                             = t . stack_num_up        . text_style,
-            SubscriptBaselineDropMin                    = t . sub_shift_drop      . display_style,
-            SubscriptShiftDown                          = t . sub_shift_down      . display_style, -- idem
-            SubscriptTopMax                             = t . sub_top_max         . display_style,
-            SubSuperscriptGapMin                        = t . subsup_vgap         . display_style,
-            SuperscriptBaselineDropMax                  = t . sup_shift_drop      . display_style,
-            SuperscriptBottomMaxWithSubscript           = t . sup_sub_bottom_max  . display_style,
-            SuperscriptBottomMin                        = t . sup_bottom_min      . display_style,
-            SuperscriptShiftUp                          = t . sup_shift_up        . display_style,
-            SuperscriptShiftUpCramped                   = t . sup_shift_up        . cramped_display_style,
-            UnderbarExtraDescender                      = t . underbar_kern       . display_style,
-            UnderbarRuleThickness                       = t . underbar_rule       . display_style,
-            UnderbarVerticalGap                         = t . underbar_vgap       . display_style,
-            UpperLimitBaselineRiseMin                   = t . limit_above_bgap    . display_style,
-            UpperLimitGapMin                            = t . limit_above_vgap    . display_style,
+            SubscriptBaselineDropMin                    = t . sub_shift_drop      . text_style,
+            SubscriptShiftDown                          = t . sub_shift_down      . text_style,
+            SubscriptTopMax                             = t . sub_top_max         . text_style,
+            SubSuperscriptGapMin                        = t . subsup_vgap         . text_style,
+            SuperscriptBaselineDropMax                  = t . sup_shift_drop      . text_style,
+            SuperscriptBottomMaxWithSubscript           = t . sup_sub_bottom_max  . text_style,
+            SuperscriptBottomMin                        = t . sup_bottom_min      . text_style,
+            SuperscriptShiftUp                          = t . sup_shift_up        . text_style,
+            SuperscriptShiftUpCramped                   = t . sup_shift_up        . cramped_text_style,
+            UnderbarExtraDescender                      = t . underbar_kern       . text_style,
+            UnderbarRuleThickness                       = t . underbar_rule       . text_style,
+            UnderbarVerticalGap                         = t . underbar_vgap       . text_style,
+            UpperLimitBaselineRiseMin                   = t . limit_above_bgap    . text_style,
+            UpperLimitGapMin                            = t . limit_above_vgap    . text_style,
         }
+        d.AccentBaseHeight = 0
         return t, d -- this might change
     else
         return { }, { }

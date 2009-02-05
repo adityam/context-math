@@ -41,13 +41,9 @@ function fonts.vf.math.define(specification,set)
         end
     end
     main = table.copy(fnt[main or 1])
-    main.name, main.type, main.fonts = name, 'virtual', lst
-    main.math_parameters = { }
-    local characters = main.characters
-    local descriptions = main.descriptions
---~ for i=1,22 do
---~     main.parameters[i] = main.parameters[i] or 0
---~ end
+    main.name, main.fonts, main.virtualized, main.math_parameters = name, lst, true, { }
+    local characters, descriptions = main.characters, main.descriptions
+    main.parameters.x_height = main.parameters.x_height or 0
     for s=1,#set do
         local ss, fs = set[s], fnt[s]
         if ss.optional and fonts.vf.math.optional then
@@ -55,17 +51,17 @@ function fonts.vf.math.define(specification,set)
         else
             local mm, fp = main.math_parameters, fs.parameters
             if ss.extension then
-            --  logs.report("math virtual","loading and virtualizing font %s at size %s, setting ex parameters",name,size)
-                mm.math_x_height          = mm.math_x_height or fp[ 5] or 0 -- math_x_height           height of x
+                mm.math_x_height          = fp.x_height or 0 -- math_x_height           height of x
                 mm.default_rule_thickness = fp[ 8] or 0 -- default_rule_thickness  thickness of \over bars
                 mm.big_op_spacing1        = fp[ 9] or 0 -- big_op_spacing1         minimum clearance above a displayed op
                 mm.big_op_spacing2        = fp[10] or 0 -- big_op_spacing2         minimum clearance below a displayed op
                 mm.big_op_spacing3        = fp[11] or 0 -- big_op_spacing3         minimum baselineskip above displayed op
                 mm.big_op_spacing4        = fp[12] or 0 -- big_op_spacing4         minimum baselineskip below displayed op
                 mm.big_op_spacing5        = fp[13] or 0 -- big_op_spacing5         padding above and below displayed limits
+            --  logs.report("math virtual","loading and virtualizing font %s at size %s, setting ex parameters",name,size)
             elseif ss.parameters then
-            --  logs.report("math virtual","loading and virtualizing font %s at size %s, setting sy parameters",name,size)
-                mm.math_x_height = mm.math_x_height or fp[ 5] or 0 -- math_x_height           height of x
+                main.parameters.x_height = fp.x_height or main.parameters.x_height
+                mm.x_height      = mm.x_height or fp.x_height or 0 -- x_height                height of x
                 mm.num1          = fp[ 8] or 0 -- num1                    numerator shift-up in display styles
                 mm.num2          = fp[ 9] or 0 -- num2                    numerator shift-up in non-display, non-\atop
                 mm.num3          = fp[10] or 0 -- num3                    numerator shift-up in non-display \atop
@@ -81,6 +77,7 @@ function fonts.vf.math.define(specification,set)
                 mm.delim1        = fp[20] or 0 -- delim1                  size of \atopwithdelims delimiters in display styles
                 mm.delim2        = fp[21] or 0 -- delim2                  size of \atopwithdelims delimiters in non-displays
                 mm.axis_height   = fp[22] or 0 -- axis_height             height of fraction lines above the baseline
+            --  logs.report("math virtual","loading and virtualizing font %s at size %s, setting sy parameters",name,size)
             end
             local vector = ss.vector
             if vector then
@@ -108,10 +105,10 @@ function fonts.vf.math.define(specification,set)
                                 -- we can share these
                                 local e = fci.extensible
                                 if e then
-                                    local top = e.top if top ~= 0 then top = top + 0xFF000 end
-                                    local rep = e.rep if rep ~= 0 then rep = rep + 0xFF000 end
-                                    local mid = e.mid if mid ~= 0 then mid = mid + 0xFF000 end
-                                    local bot = e.bot if bot ~= 0 then bot = bot + 0xFF000 end
+                                    local top = e.top if top ~= 0 then top = top + 0xFF000 else top = nil end
+                                    local rep = e.rep if rep ~= 0 then rep = rep + 0xFF000 else rep = nil end
+                                    local mid = e.mid if mid ~= 0 then mid = mid + 0xFF000 else mid = nil end
+                                    local bot = e.bot if bot ~= 0 then bot = bot + 0xFF000 else bot = nil end
                                     characters[0xFF000 + index] = {
                                         width      = fci.width,
                                         height     = fci.height,
@@ -177,6 +174,7 @@ function fonts.vf.math.define(specification,set)
         logs.report("math virtual","loading and virtualizing font %s at size %s took %0.3f seconds",name,size,os.clock()-start)
     end
     main.MathConstants = fonts.tfm.scaled_math_parameters(main.math_parameters,1)
+--~ print(main.fontname,main.fullname,table.serialize(main.MathConstants),main.parameters.x_height)
     return main
 end
 
@@ -258,7 +256,6 @@ fonts.enc.math["traditional-mr"] = {
     [0x002C7] = 0x14, -- [math]check
     [0x002D8] = 0x15, -- [math]breve
     [0x000AF] = 0x16, -- [math]bar
-    [0x002DA] = 0x17, -- [math]ring
     [0x00021] = 0x21, -- !
     [0x00028] = 0x28, -- (
     [0x00029] = 0x29, -- )
@@ -287,11 +284,13 @@ fonts.enc.math["traditional-mr"] = {
     [0x00396] = 0x5A, -- Zeta
     [0x0005B] = 0x5B, -- [
     [0x0005D] = 0x5D, -- ]
-    [0x0005E] = 0x5E, -- [math]hat
+    [0x0005E] = 0x5E, -- [math]hat -- the text one
+    [0x00302] = 0x5E, -- [math]hat -- the real math one
     [0x002D9] = 0x5F, -- [math]dot
     [0x02146] = 0x64,
     [0x02147] = 0x65,
-    [0x002DC] = 0x7E, -- [math]tilde
+    [0x002DC] = 0x7E, -- [math]tilde -- the text one
+    [0x00303] = 0x7E, -- [math]tilde -- the real one
     [0x000A8] = 0x7F, -- [math]ddot
 }
 
