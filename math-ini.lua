@@ -1,4 +1,4 @@
-if not modules then modules = { } end modules ['math-ini'] = {
+if not modules then modules = { } end modules ['math-ext'] = {
     version   = 1.001,
     comment   = "companion to math-ini.tex",
     author    = "Hans Hagen, PRAGMA-ADE, Hasselt NL",
@@ -13,50 +13,51 @@ local texsprint, format, utfchar, utfbyte = tex.sprint, string.format, utf.char,
 
 local trace_defining = false  trackers.register("math.defining", function(v) trace_defining = v end)
 
-mathematics       = mathematics       or { }
-mathematics.data  = mathematics.data  or { }
-mathematics.slots = mathematics.slots or { }
+mathematics = mathematics or { }
 
-function mathematics.parameterset()
-    return {
-        quad = 0,
-        axis = 0,
-        overbarkern = 0,
-        overbarrule = 0,
-        overbarvgap = 0,
-        underbarkern = 0,
-        underbarrule = 0,
-        underbarvgap = 0,
-        radicalkern = 0,
-        radicalrule = 0,
-        radicalvgap = 0,
-        stackvgap = 0,
-        stacknumup = 0,
-        stackdenomdown = 0,
-        fractionrule = 0,
-        fractionnumvgap = 0,
-        fractionnumup = 0,
-        fractiondenomvgap = 0,
-        fractiondenomdown = 0,
-        fractiondelsize = 0,
-        limitabovevgap = 0,
-        limitabovebgap = 0,
-        limitabovekern = 0,
-        limitbelowvgap = 0,
-        limitbelowbgap = 0,
-        limitbelowkern = 0,
-        subshiftdrop = 0,
-        supshiftdrop = 0,
-        subshiftdown = 0,
-        subsupshiftdown = 0,
-        supshiftup = 0,
-        subtopmax = 0,
-        supbottommin = 0,
-        supsubbottommax = 0,
-        subsupvgap = 0,
-        spaceafterscrip = 0,
-    }
-end
+mathematics.extrabase   = 0xFE000 -- here we push some virtuals
+mathematics.privatebase = 0xFF000 -- here we push the ex
+
+--~ function mathematics.parameterset()
+--~     return {
+--~         quad = 0,
+--~         axis = 0,
+--~         overbarkern = 0,
+--~         overbarrule = 0,
+--~         overbarvgap = 0,
+--~         underbarkern = 0,
+--~         underbarrule = 0,
+--~         underbarvgap = 0,
+--~         radicalkern = 0,
+--~         radicalrule = 0,
+--~         radicalvgap = 0,
+--~         stackvgap = 0,
+--~         stacknumup = 0,
+--~         stackdenomdown = 0,
+--~         fractionrule = 0,
+--~         fractionnumvgap = 0,
+--~         fractionnumup = 0,
+--~         fractiondenomvgap = 0,
+--~         fractiondenomdown = 0,
+--~         fractiondelsize = 0,
+--~         limitabovevgap = 0,
+--~         limitabovebgap = 0,
+--~         limitabovekern = 0,
+--~         limitbelowvgap = 0,
+--~         limitbelowbgap = 0,
+--~         limitbelowkern = 0,
+--~         subshiftdrop = 0,
+--~         supshiftdrop = 0,
+--~         subshiftdown = 0,
+--~         subsupshiftdown = 0,
+--~         supshiftup = 0,
+--~         subtopmax = 0,
+--~         supbottommin = 0,
+--~         supsubbottommax = 0,
+--~         subsupvgap = 0,
+--~         spaceafterscrip = 0,
+--~     }
+--~ end
 
 local families = {
     tf = 1, it = 2, sl = 4, bf = 5, bi = 6, bs = 7, -- virtual fonts or unicode otf
@@ -100,11 +101,8 @@ classes.large       = classes.op
 classes.variable    = classes.alphabetic
 classes.number      = classes.alphabetic
 
-local function mathcode(target,class,family,slot)
-    if class <= 7 then
-        return format('\\Umathcode%s="%X "%X "%X ',target,class,family,slot)
-    end
-end
+-- there will be proper functions soon (and we will move this code in-line)
+
 local function delcode(target,family,slot)
     return format('\\Udelcode%s="%X "%X ',target,family,slot)
 end
@@ -112,8 +110,7 @@ local function mathchar(class,family,slot)
     return format('\\Umathchar "%X "%X "%X ',class,family,slot)
 end
 local function mathaccent(class,family,slot)
-    class = 0
-    return format('\\Umathaccent "%X "%X "%X ',class,family,slot)
+    return format('\\Umathaccent "%X "%X "%X ',0,family,slot) -- no class
 end
 local function delimiter(class,family,slot)
     return format('\\Udelimiter "%X "%X "%X ',class,family,slot)
@@ -121,13 +118,11 @@ end
 local function radical(family,slot)
     return format('\\Uradical "%X "%X ',family,slot)
 end
-local function mathchardef(name,class,family,slot) -- we can avoid this one
+local function mathchardef(name,class,family,slot)
     return format('\\Umathchardef\\%s "%X "%X "%X ',name,class,family,slot)
 end
 local function mathcode(target,class,family,slot)
-    if class <= 7 then
-        return format('\\Umathcode%s="%X "%X "%X ',target,class,family,slot)
-    end
+    return format('\\Umathcode%s="%X "%X "%X ',target,class,family,slot)
 end
 
 mathematics.delcode     = delcode
@@ -161,8 +156,10 @@ end
 
 local function setmathcharacter(class,family,slot,unicode)
     class = classes[class] or class
-    family = families[family] or family
-    texsprint(mathcode(slot,class,family,unicode or slot))
+    if class <= 7 then
+        family = families[family] or family
+        texsprint(mathcode(slot,class,family,unicode or slot))
+    end
 end
 
 mathematics.setmathsymbol    = setmathsymbol
@@ -172,11 +169,11 @@ local function report(class,family,unicode,name)
     local classname = mathematics.classes[class] or class
     local nametype = type(name)
     if nametype == "string" then
-        logs.report("mathematics","%s:%s %s U+%05X (%s) -> %s",classname,class,family,unicode,utfchar(unicode),name)
+        logs.report("mathematics","%s:%s %s U+%05X (%s) => %s",classname,class,family,unicode,utfchar(unicode),name)
     elseif nametype == "number" then
-        logs.report("mathematics","%s:%s %s U+%05X (%s) -> U+%05X",classname,class,family,unicode,utfchar(unicode),name)
+        logs.report("mathematics","%s:%s %s U+%05X (%s) => U+%05X",classname,class,family,unicode,utfchar(unicode),name)
     else
-        logs.report("mathematics","%s:%s %s U+%05X (%s)",      classname,class,family,unicode,utfchar(unicode))
+        logs.report("mathematics","%s:%s %s U+%05X (%s)", classname,class,family,unicode,utfchar(unicode))
     end
 end
 
@@ -275,4 +272,23 @@ function mathematics.register_xml_entities()
             entities[name] = utfchar(unicode)
         end
     end
+end
+
+-- helpers
+
+function mathematics.big(tfmdata,unicode,n)
+    local t = tfmdata.characters
+    local c = t[unicode]
+    if c then
+        local next = c.next
+        while next do
+            if n <= 1 then
+                return next
+            else
+                n = n - 1
+                next = t[next].next
+            end
+        end
+    end
+    return unicode
 end

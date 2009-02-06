@@ -16,7 +16,46 @@ local shared = { }
 fonts.vf.math          = fonts.vf.math or { }
 fonts.vf.math.optional = false
 
+local push, pop, back = { "push" }, { "pop" }, { "slot", 1, 0x2215 }
+
+local function negate(main,unicode,basecode)
+    local characters = main.characters
+    local basechar = characters[basecode]
+    local ht, wd = basechar.height, basechar.width
+    characters[unicode] = {
+        width    = wd,
+        height   = ht,
+        depth    = basechar.depth,
+        italic   = basechar.italic,
+        kerns    = basechar.kerns,
+        commands = {
+            { "slot", 1, basecode },
+            push,
+            { "down",    ht/5},
+            { "right", - wd/2},
+            back,
+            push,
+        }
+    }
+end
+
+function fonts.vf.math.alas(main)
+    negate(main,0x2260,0x003D)
+end
+
+local reverse -- index -> unicode
+
 function fonts.vf.math.define(specification,set)
+    if not reverse then
+        reverse = { }
+        for k, v in next, fonts.enc.math do
+            local r = { }
+            for u, i in next, v do
+                r[i] = u
+            end
+            reverse[k] = r
+        end
+    end
     local name = specification.name -- symbolic name
     local size = specification.size -- given size
     local fnt, lst, main = { }, { }, nil
@@ -79,9 +118,10 @@ function fonts.vf.math.define(specification,set)
                 mm.axis_height   = fp[22] or 0 -- axis_height             height of fraction lines above the baseline
             --  logs.report("math virtual","loading and virtualizing font %s at size %s, setting sy parameters",name,size)
             end
-            local vector = ss.vector
-            if vector then
-                vector = fonts.enc.math[vector]
+            local vectorname = ss.vector
+            if vectorname then
+                local vector = fonts.enc.math[vectorname]
+                local rotcev = reverse[vectorname]
                 if vector then
                     local fc, fd, si = fs.characters, fs.descriptions, shared[s]
                     if ss.extension then
@@ -98,11 +138,10 @@ function fonts.vf.math.define(specification,set)
                                     width    = fci.width,
                                     height   = fci.height,
                                     depth    = fci.depth,
-                                    next     = n + 0xFF000,
+                                    next     = 0xFF000 + n,
                                     commands = ref,
                                 }
                             else
-                                -- we can share these
                                 local e = fci.extensible
                                 if e then
                                     local top = e.top if top ~= 0 then top = top + 0xFF000 else top = nil end
@@ -138,18 +177,35 @@ function fonts.vf.math.define(specification,set)
                                     ref = { { 'slot', s, index } }
                                     si[index] = ref
                                 end
-                                characters[unicode] = {
-                                    width    = fci.width,
-                                    height   = fci.height,
-                                    depth    = fci.depth,
-                                    italic   = fci.italic,
-                                    kerns    = fci.kerns,
-                                    commands = ref,
-                                    next     = 0xFF000 + index
-                                }
+                                local kerns = fci.kerns
+                                if kerns then
+                                    local krn = { }
+                                    for k=1,#kerns do
+                                        krn[0xFF000 + k] = kerns[k]
+                                    end
+                                    characters[unicode] = {
+                                        width    = fci.width,
+                                        height   = fci.height,
+                                        depth    = fci.depth,
+                                        italic   = fci.italic,
+                                        commands = ref,
+                                        kerns    = krn,
+                                        next     = 0xFF000 + index,
+                                    }
+                                else
+                                    characters[unicode] = {
+                                        width    = fci.width,
+                                        height   = fci.height,
+                                        depth    = fci.depth,
+                                        italic   = fci.italic,
+                                        commands = ref,
+                                        next     = 0xFF000 + index,
+                                    }
+                                end
                             end
                         end
                     end
+                    local skewchar = ss.skewchar
                     for unicode, index in next, vector do
                         local fci = fc[index]
                         local ref = si[index]
@@ -157,22 +213,51 @@ function fonts.vf.math.define(specification,set)
                             ref = { { 'slot', s, index } }
                             si[index] = ref
                         end
-                        characters[unicode] = {
-                            width    = fci.width,
-                            height   = fci.height,
-                            depth    = fci.depth,
-                            italic   = fci.italic,
-                            kerns    = fci.kerns,
-                            commands = ref,
-                        }
+                        local kerns = fci.kerns
+                        if kerns then
+                            local width = fci.width
+                            local krn = { }
+                            for k=1,#kerns do
+                                local rk = rotcev[k]
+                                if rk then
+                                    krn[rk] = kerns[k]
+                                end
+                            end
+                            local t = {
+                                width    = width,
+                                height   = fci.height,
+                                depth    = fci.depth,
+                                italic   = fci.italic,
+                                kerns    = krn,
+                                commands = ref,
+                            }
+                            if skewchar and kerns then
+                                local k = kerns[skewchar]
+                                if k then
+                                    t.top_accent = width/2 + k
+                                end
+                            end
+                            characters[unicode] = t
+                        else
+                            characters[unicode] = {
+                                width    = fci.width,
+                                height   = fci.height,
+                                depth    = fci.depth,
+                                italic   = fci.italic,
+                                commands = ref,
+                            }
+                        end
                     end
                 end
             end
+            mathematics.extras.copy(main) --not needed here (yet)
         end
     end
+    fonts.vf.math.alas(main)
     if trace_virtual or trace_timings then
         logs.report("math virtual","loading and virtualizing font %s at size %s took %0.3f seconds",name,size,os.clock()-start)
     end
+    main.type = "virtual" -- not needed
     main.MathConstants = fonts.tfm.scaled_math_parameters(main.math_parameters,1)
 --~ print(main.fontname,main.fullname,table.serialize(main.MathConstants),main.parameters.x_height)
     return main
@@ -185,8 +270,6 @@ function mathematics.make_font(name, set)
 end
 
 -- varphi is part of the alphabet, contrary to the other var*s'
-
-mathematics.private = 0xFF000 -- here we push the ex
 
 fonts.enc.math["large-to-small"] = {
     [0x00028] = 0x00, -- (
@@ -212,32 +295,31 @@ fonts.enc.math["large-to-small"] = {
     [0x02195] = 0x3F, -- updownarrow
 --~ [0x0]     = 0x40, -- lmoustache
 --~ [0x0]     = 0x41, -- rmoustache
---  [0x0005E] = 0x62, -- widehat
---  [0x0007E] = 0x65, -- widetilde
     [0x0221A] = 0x70, -- sqrt
     [0x021D5] = 0x77, -- Updownarrow
     [0x02191] = 0x78, -- uparrow
     [0x02193] = 0x79, -- downarrow
     [0x021D1] = 0x7E, -- Uparrow
     [0x021D3] = 0x7F, -- Downarrow
-
---~     [0x0005E] = 0x62, -- widehat
---~     [0x0007E] = 0x65, -- widetilde
-    [0x00302] = 0x62, -- widehat
-    [0x00303] = 0x65, -- widetilde
-}
-
-fonts.enc.math["traditional-ex"] = {
     [0x0220F] = 0x51, -- prod
+    [0x0222B] = 0x52, -- intop
     [0x02210] = 0x60, -- coprod
     [0x02211] = 0x50, -- sum
-    [0x0222B] = 0x52, -- intop
+    [0xFE302] = 0x62, -- widehat
+    [0xFE303] = 0x65, -- widetilde
     [0x022C0] = 0x56, -- bigwedge
     [0x022C1] = 0x57, -- bigvee
     [0x022C2] = 0x54, -- bigcap
     [0x022C3] = 0x53, -- bigcup
---~ [0x02215] = 0x3D, -- /
+    [0x02215] = 0x3D, -- /
 }
+
+fonts.enc.math["traditional-ex"] = {
+    -- no characters
+}
+
+-- only math stuff is needed, since we always use an lm or gyre
+-- font as main font
 
 fonts.enc.math["traditional-mr"] = {
     [0x00393] = 0x00, -- Gamma
@@ -251,23 +333,23 @@ fonts.enc.math["traditional-mr"] = {
     [0x003A6] = 0x08, -- Phi
     [0x003A8] = 0x09, -- Psi
     [0x003A9] = 0x0A, -- Omega
-    [0x00060] = 0x12, -- [math]grave
-    [0x000B4] = 0x13, -- [math]acute
-    [0x002C7] = 0x14, -- [math]check
-    [0x002D8] = 0x15, -- [math]breve
-    [0x000AF] = 0x16, -- [math]bar
-    [0x00021] = 0x21, -- !
-    [0x00028] = 0x28, -- (
-    [0x00029] = 0x29, -- )
-    [0x0002B] = 0x2B, -- +
-    [0x0002F] = 0x2F, -- /
-    [0x0003A] = 0x3A, -- :
-    [0x02236] = 0x3A, -- colon
-    [0x0003B] = 0x3B, -- ;
-    [0x0003C] = 0x3C, -- <
-    [0x0003D] = 0x3D, -- =
-    [0x0003E] = 0x3E, -- >
-    [0x0003F] = 0x3F, -- ?
+--  [0x00060] = 0x12, -- [math]grave
+--  [0x000B4] = 0x13, -- [math]acute
+--  [0x002C7] = 0x14, -- [math]check
+--  [0x002D8] = 0x15, -- [math]breve
+--  [0x000AF] = 0x16, -- [math]bar
+--  [0x00021] = 0x21, -- !
+--  [0x00028] = 0x28, -- (
+--  [0x00029] = 0x29, -- )
+--  [0x0002B] = 0x2B, -- +
+--  [0x0002F] = 0x2F, -- /
+--  [0x0003A] = 0x3A, -- :
+--  [0x02236] = 0x3A, -- colon
+--  [0x0003B] = 0x3B, -- ;
+--  [0x0003C] = 0x3C, -- <
+--  [0x0003D] = 0x3D, -- =
+--  [0x0003E] = 0x3E, -- >
+--  [0x0003F] = 0x3F, -- ?
     [0x00391] = 0x41, -- Alpha
     [0x00392] = 0x42, -- Beta
     [0x02145] = 0x44,
@@ -282,16 +364,16 @@ fonts.enc.math["traditional-mr"] = {
     [0x003A4] = 0x54, -- Tau
     [0x003A7] = 0x58, -- Chi
     [0x00396] = 0x5A, -- Zeta
-    [0x0005B] = 0x5B, -- [
-    [0x0005D] = 0x5D, -- ]
-    [0x0005E] = 0x5E, -- [math]hat -- the text one
-    [0x00302] = 0x5E, -- [math]hat -- the real math one
-    [0x002D9] = 0x5F, -- [math]dot
+--  [0x0005B] = 0x5B, -- [
+--  [0x0005D] = 0x5D, -- ]
+--  [0x0005E] = 0x5E, -- [math]hat -- the text one
+--  [0x00302] = 0x5E, -- [math]hat -- the real math one
+--  [0x002D9] = 0x5F, -- [math]dot
     [0x02146] = 0x64,
     [0x02147] = 0x65,
-    [0x002DC] = 0x7E, -- [math]tilde -- the text one
-    [0x00303] = 0x7E, -- [math]tilde -- the real one
-    [0x000A8] = 0x7F, -- [math]ddot
+--  [0x002DC] = 0x7E, -- [math]tilde -- the text one
+--  [0x00303] = 0x7E, -- [math]tilde -- the real one
+--  [0x000A8] = 0x7F, -- [math]ddot
 }
 
 fonts.enc.math["traditional-mi"] = {
@@ -599,289 +681,7 @@ fonts.enc.math["traditional-sy"] = {
     [0x0005C] = 0x6E, -- \, backslash, setminus
     [0x02216] = 0x6E, -- setminus
     [0x02240] = 0x6F, -- wr
---  [0x0221A] = 0x70, -- sqrt. AM: Check surd??
-    [0x02A3F] = 0x71, -- amalg
-    [0x02207] = 0x72, -- nabla
-    [0x0222B] = 0x73, -- smallint (TODO: what about intop?)
-    [0x02294] = 0x74, -- sqcup
-    [0x02293] = 0x75, -- sqcap
-    [0x02291] = 0x76, -- sqsubseteq
-    [0x02292] = 0x77, -- sqsupseteq
-    [0x000A7] = 0x78, -- S
-    [0x02020] = 0x79, -- dagger, dag
-    [0x02021] = 0x7A, -- ddagger, ddag
-    [0x000B6] = 0x7B, -- P
-    [0x02663] = 0x7C, -- clubsuit
-    [0x02662] = 0x7D, -- diamondsuit
-    [0x02661] = 0x7E, -- heartsuit
-    [0x02660] = 0x7F, -- spadesuit
-}
-
-fonts.enc.math["traditional-sy"] = {
-    [0x0002D] = 0x00, -- -
-    [0x02212] = 0x00, -- -
---  [0x02201] = 0x00, -- complement
---  [0x02206] = 0x00, -- increment
---  [0x02204] = 0x00, -- not exists
-    [0x000B7] = 0x01, -- cdot
-    [0x022C5] = 0x01, -- cdot
-    [0x000D7] = 0x02, -- times
-    [0x0002A] = 0x03, -- *
-    [0x02217] = 0x03, -- *
-    [0x000F7] = 0x04, -- div
-    [0x022C4] = 0x05, -- diamond
-    [0x000B1] = 0x06, -- pm
-    [0x02213] = 0x07, -- mp
-    [0x02295] = 0x08, -- oplus
-    [0x02296] = 0x09, -- ominus
-    [0x02297] = 0x0A, -- otimes
-    [0x02298] = 0x0B, -- oslash
-    [0x02299] = 0x0C, -- odot
---  [0x0]     = 0x0D, -- bigcirc, Orb (either 25EF or 25CB)
-    [0x02218] = 0x0E, -- circ
-    [0x02219] = 0x0F, -- bullet
-    [0x02022] = 0x0F, -- bullet
-    [0x0224D] = 0x10, -- asymp
-    [0x02261] = 0x11, -- equiv
-    [0x02286] = 0x12, -- subseteq
-    [0x02287] = 0x13, -- supseteq
-    [0x02264] = 0x14, -- leq
-    [0x02265] = 0x15, -- geq
-    [0x02AAF] = 0x16, -- preceq
---  [0x0227C] = 0x16, -- preceq, AM:No see 2AAF
-    [0x02AB0] = 0x17, -- succeq
---  [0x0227D] = 0x17, -- succeq, AM:No see 2AB0
-    [0x0223C] = 0x18, -- sim
-    [0x02248] = 0x19, -- approx
-    [0x02282] = 0x1A, -- subset
-    [0x02283] = 0x1B, -- supset
-    [0x0226A] = 0x1C, -- ll
-    [0x0226B] = 0x1D, -- gg
-    [0x0227A] = 0x1E, -- prec
-    [0x0227B] = 0x1F, -- succ
-    [0x02190] = 0x20, -- leftarrow
-    [0x02192] = 0x21, -- rightarrow
-    [0x02191] = 0x22, -- uparrow
-    [0x02193] = 0x23, -- downarrow
-    [0x02194] = 0x24, -- leftrightarrow
-    [0x02197] = 0x25, -- nearrow
-    [0x02198] = 0x26, -- searrow
-    [0x02243] = 0x27, -- simeq
-    [0x021D0] = 0x28, -- Leftarrow
-    [0x021D2] = 0x29, -- Rightarrow
-    [0x021D1] = 0x2A, -- Uparrow
-    [0x021D3] = 0x2B, -- Downarrow
-    [0x021D4] = 0x2C, -- Leftrightarrow
-    [0x02196] = 0x2D, -- nwarrow
-    [0x02199] = 0x2E, -- swarrow
-    [0x0221D] = 0x2F, -- propto
---  [0x02032] = 0x30, -- prime (not really the right symbol)
-    [0x0221E] = 0x31, -- infty
-    [0x02208] = 0x32, -- in
-    [0x0220B] = 0x33, -- ni
-    [0x025B3] = 0x34, -- triangle, bigtriangleup
-    [0x025BD] = 0x35, -- bigtriangledown
---              0x36, -- not
---              0x37, -- (beginning of arrow)
-    [0x02200] = 0x38, -- forall
-    [0x02203] = 0x39, -- exists
-    [0x000AC] = 0x3A, -- neg, lnot
-    [0x02205] = 0x3B, -- empty set
-    [0x0211C] = 0x3C, -- Re
-    [0x02111] = 0x3D, -- Im
-    [0x022A4] = 0x3E, -- top
-    [0x022A5] = 0x3F, -- bot, perp
-    [0x02135] = 0x40, -- aleph
-    [0x1D49C] = 0x41, -- script A
-    [0x0212C] = 0x42, -- script B
-    [0x1D49E] = 0x43, -- script C
-    [0x1D49F] = 0x44, -- script D
-    [0x02130] = 0x45, -- script E
-    [0x02131] = 0x46, -- script F
-    [0x1D4A2] = 0x47, -- script G
-    [0x0210B] = 0x48, -- script H
-    [0x02110] = 0x49, -- script I
-    [0x1D4A5] = 0x4A, -- script J
-    [0x1D4A6] = 0x4B, -- script K
-    [0x02112] = 0x4C, -- script L
-    [0x02133] = 0x4D, -- script M
-    [0x1D4A9] = 0x4E, -- script N
-    [0x1D4AA] = 0x4F, -- script O
-    [0x1D4AB] = 0x50, -- script P
-    [0x1D4AC] = 0x51, -- script Q
-    [0x0211B] = 0x52, -- script R
-    [0x1D4AE] = 0x53, -- script S
-    [0x1D4AF] = 0x54, -- script T
-    [0x1D4B0] = 0x55, -- script U
-    [0x1D4B1] = 0x56, -- script V
-    [0x1D4B2] = 0x57, -- script W
-    [0x1D4B3] = 0x58, -- script X
-    [0x1D4B4] = 0x59, -- script Y
-    [0x1D4B5] = 0x5A, -- script Z
-    [0x0222A] = 0x5B, -- cup
-    [0x02229] = 0x5C, -- cap
-    [0x0228E] = 0x5D, -- uplus
-    [0x02227] = 0x5E, -- wedge, land
-    [0x02228] = 0x5F, -- vee, lor
-    [0x022A2] = 0x60, -- vdash
-    [0x022A3] = 0x61, -- dashv
-    [0x0230A] = 0x62, -- lfloor
-    [0x0230B] = 0x63, -- rfloor
-    [0x02308] = 0x64, -- lceil
-    [0x02309] = 0x65, -- rceil
-    [0x0007B] = 0x66, -- {, lbrace
-    [0x0007D] = 0x67, -- }, rbrace
-    [0x027E8] = 0x68, -- <, langle
-    [0x027E9] = 0x69, -- >, rangle
-    [0x0007C] = 0x6A, -- |, mid, lvert, rvert
-    [0x02225] = 0x6B, -- parallel, Vert, lVert, rVert, arrowvert
-    [0x02195] = 0x6C, -- updownarrow
-    [0x021D5] = 0x6D, -- Updownarrow
-    [0x0005C] = 0x6E, -- \, backslash, setminus
-    [0x02216] = 0x6E, -- setminus
-    [0x02240] = 0x6F, -- wr
---  [0x0221A] = 0x70, -- sqrt. AM: Check surd??
-    [0x02A3F] = 0x71, -- amalg
-    [0x02207] = 0x72, -- nabla
-    [0x0222B] = 0x73, -- smallint (TODO: what about intop?)
-    [0x02294] = 0x74, -- sqcup
-    [0x02293] = 0x75, -- sqcap
-    [0x02291] = 0x76, -- sqsubseteq
-    [0x02292] = 0x77, -- sqsupseteq
-    [0x000A7] = 0x78, -- S
-    [0x02020] = 0x79, -- dagger, dag
-    [0x02021] = 0x7A, -- ddagger, ddag
-    [0x000B6] = 0x7B, -- P
-    [0x02663] = 0x7C, -- clubsuit
-    [0x02662] = 0x7D, -- diamondsuit
-    [0x02661] = 0x7E, -- heartsuit
-    [0x02660] = 0x7F, -- spadesuit
-}
-
-fonts.enc.math["traditional-sy"] = {
-    [0x0002D] = 0x00, -- -
-    [0x02212] = 0x00, -- -
---  [0x02201] = 0x00, -- complement
---  [0x02206] = 0x00, -- increment
---  [0x02204] = 0x00, -- not exists
-    [0x000B7] = 0x01, -- cdot
-    [0x022C5] = 0x01, -- cdot
-    [0x000D7] = 0x02, -- times
-    [0x0002A] = 0x03, -- *
-    [0x02217] = 0x03, -- *
-    [0x000F7] = 0x04, -- div
-    [0x022C4] = 0x05, -- diamond
-    [0x000B1] = 0x06, -- pm
-    [0x02213] = 0x07, -- mp
-    [0x02295] = 0x08, -- oplus
-    [0x02296] = 0x09, -- ominus
-    [0x02297] = 0x0A, -- otimes
-    [0x02298] = 0x0B, -- oslash
-    [0x02299] = 0x0C, -- odot
---  [0x0]     = 0x0D, -- bigcirc, Orb (either 25EF or 25CB)
-    [0x02218] = 0x0E, -- circ
-    [0x02219] = 0x0F, -- bullet
-    [0x02022] = 0x0F, -- bullet
-    [0x0224D] = 0x10, -- asymp
-    [0x02261] = 0x11, -- equiv
-    [0x02286] = 0x12, -- subseteq
-    [0x02287] = 0x13, -- supseteq
-    [0x02264] = 0x14, -- leq
-    [0x02265] = 0x15, -- geq
-    [0x02AAF] = 0x16, -- preceq
---  [0x0227C] = 0x16, -- preceq, AM:No see 2AAF
-    [0x02AB0] = 0x17, -- succeq
---  [0x0227D] = 0x17, -- succeq, AM:No see 2AB0
-    [0x0223C] = 0x18, -- sim
-    [0x02248] = 0x19, -- approx
-    [0x02282] = 0x1A, -- subset
-    [0x02283] = 0x1B, -- supset
-    [0x0226A] = 0x1C, -- ll
-    [0x0226B] = 0x1D, -- gg
-    [0x0227A] = 0x1E, -- prec
-    [0x0227B] = 0x1F, -- succ
-    [0x02190] = 0x20, -- leftarrow
-    [0x02192] = 0x21, -- rightarrow
-    [0x02191] = 0x22, -- uparrow
-    [0x02193] = 0x23, -- downarrow
-    [0x02194] = 0x24, -- leftrightarrow
-    [0x02197] = 0x25, -- nearrow
-    [0x02198] = 0x26, -- searrow
-    [0x02243] = 0x27, -- simeq
-    [0x021D0] = 0x28, -- Leftarrow
-    [0x021D2] = 0x29, -- Rightarrow
-    [0x021D1] = 0x2A, -- Uparrow
-    [0x021D3] = 0x2B, -- Downarrow
-    [0x021D4] = 0x2C, -- Leftrightarrow
-    [0x02196] = 0x2D, -- nwarrow
-    [0x02199] = 0x2E, -- swarrow
-    [0x0221D] = 0x2F, -- propto
---  [0x02032] = 0x30, -- prime (not really the right symbol)
-    [0x0221E] = 0x31, -- infty
-    [0x02208] = 0x32, -- in
-    [0x0220B] = 0x33, -- ni
-    [0x025B3] = 0x34, -- triangle, bigtriangleup
-    [0x025BD] = 0x35, -- bigtriangledown
---              0x36, -- not
---              0x37, -- (beginning of arrow)
-    [0x02200] = 0x38, -- forall
-    [0x02203] = 0x39, -- exists
-    [0x000AC] = 0x3A, -- neg, lnot
-    [0x02205] = 0x3B, -- empty set
-    [0x0211C] = 0x3C, -- Re
-    [0x02111] = 0x3D, -- Im
-    [0x022A4] = 0x3E, -- top
-    [0x022A5] = 0x3F, -- bot, perp
-    [0x02135] = 0x40, -- aleph
-    [0x1D49C] = 0x41, -- script A
-    [0x0212C] = 0x42, -- script B
-    [0x1D49E] = 0x43, -- script C
-    [0x1D49F] = 0x44, -- script D
-    [0x02130] = 0x45, -- script E
-    [0x02131] = 0x46, -- script F
-    [0x1D4A2] = 0x47, -- script G
-    [0x0210B] = 0x48, -- script H
-    [0x02110] = 0x49, -- script I
-    [0x1D4A5] = 0x4A, -- script J
-    [0x1D4A6] = 0x4B, -- script K
-    [0x02112] = 0x4C, -- script L
-    [0x02133] = 0x4D, -- script M
-    [0x1D4A9] = 0x4E, -- script N
-    [0x1D4AA] = 0x4F, -- script O
-    [0x1D4AB] = 0x50, -- script P
-    [0x1D4AC] = 0x51, -- script Q
-    [0x0211B] = 0x52, -- script R
-    [0x1D4AE] = 0x53, -- script S
-    [0x1D4AF] = 0x54, -- script T
-    [0x1D4B0] = 0x55, -- script U
-    [0x1D4B1] = 0x56, -- script V
-    [0x1D4B2] = 0x57, -- script W
-    [0x1D4B3] = 0x58, -- script X
-    [0x1D4B4] = 0x59, -- script Y
-    [0x1D4B5] = 0x5A, -- script Z
-    [0x0222A] = 0x5B, -- cup
-    [0x02229] = 0x5C, -- cap
-    [0x0228E] = 0x5D, -- uplus
-    [0x02227] = 0x5E, -- wedge, land
-    [0x02228] = 0x5F, -- vee, lor
-    [0x022A2] = 0x60, -- vdash
-    [0x022A3] = 0x61, -- dashv
-    [0x0230A] = 0x62, -- lfloor
-    [0x0230B] = 0x63, -- rfloor
-    [0x02308] = 0x64, -- lceil
-    [0x02309] = 0x65, -- rceil
-    [0x0007B] = 0x66, -- {, lbrace
-    [0x0007D] = 0x67, -- }, rbrace
-    [0x027E8] = 0x68, -- <, langle
-    [0x027E9] = 0x69, -- >, rangle
-    [0x0007C] = 0x6A, -- |, mid, lvert, rvert
-    [0x02225] = 0x6B, -- parallel, Vert, lVert, rVert, arrowvert
-    [0x02195] = 0x6C, -- updownarrow
-    [0x021D5] = 0x6D, -- Updownarrow
-    [0x0005C] = 0x6E, -- \, backslash, setminus
-    [0x02216] = 0x6E, -- setminus
-    [0x02240] = 0x6F, -- wr
---  [0x0221A] = 0x70, -- sqrt. AM: Check surd??
+    [0x0221A] = 0x70, -- sqrt. AM: Check surd??
     [0x02A3F] = 0x71, -- amalg
     [0x02207] = 0x72, -- nabla
     [0x0222B] = 0x73, -- smallint (TODO: what about intop?)
@@ -907,7 +707,7 @@ fonts.enc.math["traditional-ma"] = {
     [0x022A1] = 0x00, -- squaredot             \boxdot
     [0x0229E] = 0x01, -- squareplus            \boxplus
     [0x022A0] = 0x02, -- squaremultiply        \boxtimes
-    [0x0033B] = 0x03, -- square                \square \Box
+    [0x025A1] = 0x03, -- square                \square \Box
     [0x025A0] = 0x04, -- squaresolid           \blacksquare
     [0x000B7] = 0x05, -- squaresmallsolid      \centerdot
     [0x022C4] = 0x06, -- diamond               \Diamond \lozenge
@@ -1173,17 +973,17 @@ fonts.enc.math["traditional-mb"] = {
 -- lmmib5   : LMMathItalic5-BoldItalic
 
 mathematics.make_font ( "lmroman5-math", {
-    { name = "lmroman5-regular", features = "default", main = true },
+    { name = "lmroman5-regular", features = "virtualmath", main = true },
     { name = "rm-lmr5", vector = "traditional-mr" } ,
-    { name = "lmmi5", vector = "traditional-mi" },
-    { name = "lmsy5", vector = "traditional-sy", parameters = true } ,
+    { name = "lmmi5", vector = "traditional-mi", skewchar=0x7F },
+    { name = "lmsy5", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10", vector = "traditional-ex", extension = true } ,
     { name = "msam5", vector = "traditional-ma" },
     { name = "msbm5", vector = "traditional-mb" },
     { name = "lmsans8-regular", vector = "traditional-ss", optional=true },
     { name = "lmmono8-regular", vector = "traditional-tt", optional=true },
     { name = "rm-lmbx5", vector = "traditional-bf" } ,
-    { name = "lmmib5", vector = "traditional-bi" } ,
+    { name = "lmmib5", vector = "traditional-bi", skewchar=0x7F } ,
 } )
 
 -- rm-lmr6  : LMMathRoman6-Regular
@@ -1192,17 +992,17 @@ mathematics.make_font ( "lmroman5-math", {
 -- lmmi6    : LMMathItalic6-Italic
 
 mathematics.make_font ( "lmroman6-math", {
-    { name = "lmroman6-regular", features = "default", main = true },
+    { name = "lmroman6-regular", features = "virtualmath", main = true },
     { name = "rm-lmr6", vector = "traditional-mr" } ,
-    { name = "lmmi6", vector = "traditional-mi" },
-    { name = "lmsy6", vector = "traditional-sy", parameters = true } ,
+    { name = "lmmi6", vector = "traditional-mi", skewchar=0x7F },
+    { name = "lmsy6", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10", vector = "traditional-ex", extension = true } ,
     { name = "msam5", vector = "traditional-ma" },
     { name = "msbm5", vector = "traditional-mb" },
     { name = "lmsans8-regular", vector = "traditional-ss", optional=true },
     { name = "lmmono8-regular", vector = "traditional-tt", optional=true },
     { name = "rm-lmbx6", vector = "traditional-bf" } ,
-    { name = "lmmib5", vector = "traditional-bi" } ,
+    { name = "lmmib5", vector = "traditional-bi", skewchar=0x7F } ,
 } )
 
 -- rm-lmr7  : LMMathRoman7-Regular
@@ -1213,17 +1013,17 @@ mathematics.make_font ( "lmroman6-math", {
 -- lmmib7   : LMMathItalic7-BoldItalic
 
 mathematics.make_font ( "lmroman7-math", {
-    { name = "lmroman7-regular", features = "default", main = true },
+    { name = "lmroman7-regular", features = "virtualmath", main = true },
     { name = "rm-lmr7", vector = "traditional-mr" } ,
-    { name = "lmmi7", vector = "traditional-mi" },
-    { name = "lmsy7", vector = "traditional-sy", parameters = true } ,
+    { name = "lmmi7", vector = "traditional-mi", skewchar=0x7F },
+    { name = "lmsy7", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10", vector = "traditional-ex", extension = true } ,
     { name = "msam7", vector = "traditional-ma" },
     { name = "msbm7", vector = "traditional-mb" },
     { name = "lmsans8-regular", vector = "traditional-ss", optional=true },
     { name = "lmmono8-regular", vector = "traditional-tt", optional=true },
     { name = "rm-lmbx7", vector = "traditional-bf" } ,
-    { name = "lmmib7", vector = "traditional-bi" } ,
+    { name = "lmmib7", vector = "traditional-bi", skewchar=0x7F } ,
 } )
 
 -- rm-lmr8  : LMMathRoman8-Regular
@@ -1232,17 +1032,17 @@ mathematics.make_font ( "lmroman7-math", {
 -- lmmi8    : LMMathItalic8-Italic
 
 mathematics.make_font ( "lmroman8-math", {
-    { name = "lmroman8-regular", features = "default", main = true },
+    { name = "lmroman8-regular", features = "virtualmath", main = true },
     { name = "rm-lmr8", vector = "traditional-mr" } ,
-    { name = "lmmi8", vector = "traditional-mi" },
-    { name = "lmsy8", vector = "traditional-sy", parameters = true } ,
+    { name = "lmmi8", vector = "traditional-mi", skewchar=0x7F },
+    { name = "lmsy8", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10", vector = "traditional-ex", extension = true } ,
     { name = "msam7", vector = "traditional-ma" },
     { name = "msbm7", vector = "traditional-mb" },
     { name = "lmsans8-regular", vector = "traditional-ss", optional=true },
     { name = "lmmono8-regular", vector = "traditional-tt", optional=true },
     { name = "rm-lmbx8", vector = "traditional-bf" } ,
-    { name = "lmmib7", vector = "traditional-bi" } ,
+    { name = "lmmib7", vector = "traditional-bi", skewchar=0x7F } ,
 } )
 
 -- rm-lmr9  : LMMathRoman9-Regular
@@ -1251,15 +1051,15 @@ mathematics.make_font ( "lmroman8-math", {
 -- lmmi9    : LMMathItalic9-Italic
 
 mathematics.make_font ( "lmroman9-math", {
-    { name = "lmroman9-regular", features = "default", main = true },
+    { name = "lmroman9-regular", features = "virtualmath", main = true },
     { name = "rm-lmr9", vector = "traditional-mr" } ,
-    { name = "lmmi9", vector = "traditional-mi" },
-    { name = "lmsy9", vector = "traditional-sy", parameters = true } ,
+    { name = "lmmi9", vector = "traditional-mi", skewchar=0x7F },
+    { name = "lmsy9", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10", vector = "traditional-ex", extension = true } ,
     { name = "msam10", vector = "traditional-ma" },
     { name = "msbm10", vector = "traditional-mb" },
     { name = "rm-lmbx9", vector = "traditional-bf" } ,
-    { name = "lmmib10", vector = "traditional-bi" } ,
+    { name = "lmmib10", vector = "traditional-bi", skewchar=0x7F } ,
     { name = "lmsans9-regular", vector = "traditional-ss", optional=true },
     { name = "lmmono9-regular", vector = "traditional-tt", optional=true },
 } )
@@ -1273,15 +1073,15 @@ mathematics.make_font ( "lmroman9-math", {
 -- lmmib10   : LMMathItalic10-BoldItalic
 
 mathematics.make_font ( "lmroman10-math", {
-    { name = "lmroman10-regular", features = "default", main = true },
+    { name = "lmroman10-regular", features = "virtualmath", main = true },
     { name = "rm-lmr10", vector = "traditional-mr" } ,
-    { name = "lmmi10", vector = "traditional-mi" },
-    { name = "lmsy10", vector = "traditional-sy", parameters = true } ,
+    { name = "lmmi10", vector = "traditional-mi", skewchar=0x7F },
+    { name = "lmsy10", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10", vector = "traditional-ex", extension = true } ,
     { name = "msam10", vector = "traditional-ma" },
     { name = "msbm10", vector = "traditional-mb" },
     { name = "rm-lmbx10", vector = "traditional-bf" } ,
-    { name = "lmmib10", vector = "traditional-bi" } ,
+    { name = "lmmib10", vector = "traditional-bi", skewchar=0x7F } ,
     { name = "lmsans10-regular", vector = "traditional-ss", optional=true },
     { name = "lmmono10-regular", vector = "traditional-tt", optional=true },
 } )
@@ -1291,15 +1091,15 @@ mathematics.make_font ( "lmroman10-math", {
 -- lmmi12    : LMMathItalic12-Italic
 
 mathematics.make_font ( "lmroman12-math", {
-    { name = "lmroman12-regular", features = "default", main = true },
+    { name = "lmroman12-regular", features = "virtualmath", main = true },
     { name = "rm-lmr12", vector = "traditional-mr" } ,
-    { name = "lmmi12", vector = "traditional-mi" },
-    { name = "lmsy12", vector = "traditional-sy", parameters = true } ,
+    { name = "lmmi12", vector = "traditional-mi", skewchar=0x7F },
+    { name = "lmsy12", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10", vector = "traditional-ex", extension = true } ,
     { name = "msam10", vector = "traditional-ma" },
     { name = "msbm10", vector = "traditional-mb" },
     { name = "rm-lmbx12", vector = "traditional-bf" } ,
-    { name = "lmmib10", vector = "traditional-bi" } ,
+    { name = "lmmib10", vector = "traditional-bi", skewchar=0x7F } ,
     { name = "lmsans12-regular", vector = "traditional-ss", optional=true },
     { name = "lmmono12-regular", vector = "traditional-tt", optional=true },
 } )
@@ -1307,34 +1107,36 @@ mathematics.make_font ( "lmroman12-math", {
 -- rm-lmr17 : LMMathRoman17-Regular
 
 mathematics.make_font ( "lmroman17-math", {
-    { name = "lmroman17-regular", features = "default", main = true },
+    { name = "lmroman17-regular", features = "virtualmath", main = true },
     { name = "rm-lmr12", vector = "traditional-mr" } ,
-    { name = "lmmi12", vector = "traditional-mi" },
-    { name = "lmsy12", vector = "traditional-sy", parameters = true } ,
+    { name = "lmmi12", vector = "traditional-mi", skewchar=0x7F },
+    { name = "lmsy12", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10", vector = "traditional-ex", extension = true } ,
     { name = "msam10", vector = "traditional-ma" },
     { name = "msbm10", vector = "traditional-mb" },
     { name = "rm-lmbx12", vector = "traditional-bf" } ,
-    { name = "lmmib10", vector = "traditional-bi" } ,
+    { name = "lmmib10", vector = "traditional-bi", skewchar=0x7F } ,
     { name = "lmsans17-regular", vector = "traditional-ss", optional=true },
     { name = "lmmono17-regular", vector = "traditional-tt", optional=true },
 } )
 
+-- pxr/txr messes up the accents
+
 mathematics.make_font ( "px-math", {
-    { name = "texgyrepagella-regular", features = "default", main = true },
+    { name = "texgyrepagella-regular", features = "virtualmath", main = true },
     { name = "pxr", vector = "traditional-mr" } ,
-    { name = "pxmi", vector = "traditional-mi" },
-    { name = "pxsy", vector = "traditional-sy", parameters = true } ,
+    { name = "pxmi", vector = "traditional-mi", skewchar=0x7F },
+    { name = "pxsy", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "pxex", vector = "traditional-ex", extension = true } ,
     { name = "pxsya", vector = "traditional-ma" },
     { name = "pxsyb", vector = "traditional-mb" },
 } )
 
 mathematics.make_font ( "tx-math", {
-    { name = "texgyretermes-regular", features = "default", main = true },
+    { name = "texgyretermes-regular", features = "virtualmath", main = true },
     { name = "txr", vector = "traditional-mr" } ,
-    { name = "txmi", vector = "traditional-mi" },
-    { name = "txsy", vector = "traditional-sy", parameters = true } ,
+    { name = "txmi", vector = "traditional-mi", skewchar=0x7F },
+    { name = "txsy", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "txex", vector = "traditional-ex", extension = true } ,
     { name = "txsya", vector = "traditional-ma" },
     { name = "txsyb", vector = "traditional-mb" },

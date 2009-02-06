@@ -215,14 +215,14 @@ local defaults = {
         ['text_style']={ "RadicalRuleThickness", "<not set>" },
      },
     ['radical_vgap']={
-        ['cramped_display_style']={ "RadicalDisplayStyleVerticalGap", "default_rule_thickness+(abs(math_x_height)/4)" },
-        ['cramped_script_script_style']={ "RadicalVerticalGap", "default_rule_thickness+(abs(math_x_height)/4)" },
-        ['cramped_script_style']={ "RadicalVerticalGap", "default_rule_thickness+(abs(math_x_height)/4)" },
-        ['cramped_text_style']={ "RadicalVerticalGap", "default_rule_thickness+(abs(math_x_height)/4)" },
-        ['display_style']={ "RadicalDisplayStyleVerticalGap", "default_rule_thickness+(abs(math_x_height)/4)" },
-        ['script_script_style']={ "RadicalVerticalGap", "default_rule_thickness+(abs(math_x_height)/4)" },
-        ['script_style']={ "RadicalVerticalGap", "default_rule_thickness+(abs(math_x_height)/4)" },
-        ['text_style']={ "RadicalVerticalGap", "default_rule_thickness+(abs(math_x_height)/4)" },
+        ['cramped_display_style']={ "RadicalDisplayStyleVerticalGap", "default_rule_thickness+(abs(default_rule_thickness)/4)" },
+        ['cramped_script_script_style']={ "RadicalVerticalGap", "default_rule_thickness+(abs(default_rule_thickness)/4)" },
+        ['cramped_script_style']={ "RadicalVerticalGap", "default_rule_thickness+(abs(default_rule_thickness)/4)" },
+        ['cramped_text_style']={ "RadicalVerticalGap", "default_rule_thickness+(abs(default_rule_thickness)/4)" },
+        ['display_style']={ "RadicalDisplayStyleVerticalGap", "default_rule_thickness+(abs(default_rule_thickness)/4)" },
+        ['script_script_style']={ "RadicalVerticalGap", "default_rule_thickness+(abs(default_rule_thickness)/4)" },
+        ['script_style']={ "RadicalVerticalGap", "default_rule_thickness+(abs(default_rule_thickness)/4)" },
+        ['text_style']={ "RadicalVerticalGap", "default_rule_thickness+(abs(default_rule_thickness)/4)" },
      },
     ['space_after_script']={
         ['cramped_display_style']={ "SpaceAfterScript", "script_space" },
@@ -385,6 +385,8 @@ local defaults = {
         ['text_style']={ "UnderbarVerticalGap", "3*default_rule_thickness" },
     },
 }
+
+-- MinimumDisplayOperatorHeight : <unset>
 
 function mathematics.dimensions(dimens)
     if dimens.AxisHeight or dimens.axis_height then
