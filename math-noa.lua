@@ -6,6 +6,10 @@ if not modules then modules = { } end modules ['math-noa'] = {
     license   = "see context related readme files"
 }
 
+-- beware: this is experimental code and there will be a more
+-- generic (attribute value driven) interface too but for the
+-- moment this is ok
+
 local set_attribute  = node.set_attribute
 local has_attribute  = node.has_attribute
 local mlist_to_hlist = node.mlist_to_hlist
@@ -106,6 +110,7 @@ local function process(start,what,n)
                   noad = start.sup          if noad then process(noad,what,n) end -- list
                   noad = start.sub          if noad then process(noad,what,n) end -- list
                   noad = start.accent       if noad then process(noad,what,n) end -- list
+                  noad = start.bot_accent   if noad then process(noad,what,n) end -- list
         else
             -- glue, penalty, etc
         end
@@ -137,7 +142,8 @@ noads.processors.relocate[math_char] = function(pointer)
         local newchar = remap_alphabets(a,char)
         if newchar then
             local id = font_of_family(fam)
-            if fontdata[id].characters[newchar] then -- we could probably speed this up
+            local tfmdata = fontdata[id]
+            if tfmdata and tfmdata.characters[newchar] then -- we could probably speed this up
                 if trace_remapping then
                     report_remap("char",char,newchar)
                 end
@@ -173,21 +179,33 @@ function noads.relocate_characters(head,tail,style,penalties)
     return true
 end
 
--- some resize options
+-- some resize options (this works ok because the content is
+-- empty and no larger next will be forced)
+--
+-- beware: we don't use \delcode but \Udelcode and as such have
+-- no large_fam; also, we needt to check for subtype and/or
+-- small_fam not being 0 because \. sits in 0,0 by default
+--
+-- todo: just replace the character by an ord noad
+-- and remove the right delimiter as well
 
 local attribute = attributes.numbers["mathsize"] or 241
 
 noads.processors.resize = { }
 
 noads.processors.resize[math_fence] = function(pointer)
-    -- delim -> attr small_fam small_char large_fam large_char
-    local a = has_attribute(pointer,attribute)
-    if a and a > 0 then
-        set_attribute(pointer,attribute,0)
-        local d = pointer.delim
-        local id = font_of_family(d.small_fam)
-        local ch = d.small_char
-        d.small_char = mathematics.big(fontdata[id],ch,a)
+    if pointer.subtype == 1 then -- left
+        local a = has_attribute(pointer,attribute)
+        if a and a > 0 then
+            set_attribute(pointer,attribute,0)
+            local d = pointer.delim
+            local df = d.small_fam
+            local id = font_of_family(df)
+            if id > 0 then
+                local ch = d.small_char
+                d.small_char = mathematics.big(fontdata[id],ch,a)
+            end
+        end
     end
 end
 
@@ -228,31 +246,39 @@ noads.processors.respace = { }
 
 local chardata = characters.data
 
+-- only [nd,ll,ul][po][nd,ll,ul]
+
 noads.processors.respace[math_ord] = function(pointer)
     local a = has_attribute(pointer,attribute)
     if a and a > 0 then
         set_attribute(pointer,attribute,0)
         local current_nucleus = pointer.nucleus
         if current_nucleus.id == math_char then
-        --  local current_char = current_nucleus.char
-            local next_noad = pointer.next
-            if next_noad and next_noad.id == math_punct then
-                local next_nucleus = next_noad.nucleus
-                if next_nucleus.id == math_char then
-                    local next_char = next_nucleus.char
-                    if chardata[next_char].category == "po" then
-                        local last_noad = next_noad.next
-                        if last_noad then
-                            local last_nucleus = last_noad.nucleus
-                            if last_nucleus.id == math_char then
-                            --  local last_char = last_nucleus.char
-                                local ord = node.new(math_ord)
-                                ord.nucleus, ord.sub, ord.sup, ord.attr = next_noad.nucleus, next_noad.sub, next_noad.sup, next_noad.attr
-                            --  next_noad.nucleus, next_noad.sub, next_noad.sup, next_noad.attr = nil, nil, nil, nil
-                                next_noad.nucleus, next_noad.sub, next_noad.sup = nil, nil, nil -- else crash with attributes ref count
-                                ord.next = last_noad
-                                pointer.next = ord
-                                node.free(next_noad)
+            local current_char = current_nucleus.char
+            local fc = chardata[current_char]
+            if fc == "nd" or fc == "ll" or fc == "lu" then
+                local next_noad = pointer.next
+                if next_noad and next_noad.id == math_punct then
+                    local next_nucleus = next_noad.nucleus
+                    if next_nucleus.id == math_char then
+                        local next_char = next_nucleus.char
+                        if chardata[next_char].category == "po" then
+                            local last_noad = next_noad.next
+                            if last_noad then
+                                local last_nucleus = last_noad.nucleus
+                                if last_nucleus.id == math_char then
+                                    local last_char = last_nucleus.char
+                                    local lc = chardata[first_char]
+                                    if lc == "nd" or lc == "ll" or lc == "lu" then
+                                        local ord = node.new(math_ord)
+                                        ord.nucleus, ord.sub, ord.sup, ord.attr = next_noad.nucleus, next_noad.sub, next_noad.sup, next_noad.attr
+                                    --  next_noad.nucleus, next_noad.sub, next_noad.sup, next_noad.attr = nil, nil, nil, nil
+                                        next_noad.nucleus, next_noad.sub, next_noad.sup = nil, nil, nil -- else crash with attributes ref count
+                                        ord.next = last_noad
+                                        pointer.next = ord
+                                        node.free(next_noad)
+                                    end
+                                end
                             end
                         end
                     end
@@ -282,10 +308,10 @@ nodes.tasks.new (
     }
 )
 
-nodes.tasks.appendaction("math", "normalizers", "noads.relocate_characters", nil, "nohead")
-nodes.tasks.appendaction("math", "normalizers", "noads.resize_characters",   nil, "nohead")
-nodes.tasks.appendaction("math", "normalizers", "noads.respace_characters",  nil, "nohead")
-nodes.tasks.appendaction("math", "builders",    "noads.mlist_to_hlist",      nil, "notail")
+--~ nodes.tasks.appendaction("math", "normalizers", "noads.relocate_characters", nil, "nohead")
+--~ nodes.tasks.appendaction("math", "normalizers", "noads.resize_characters",   nil, "nohead")
+--~ nodes.tasks.appendaction("math", "normalizers", "noads.respace_characters",  nil, "nohead")
+--~ nodes.tasks.appendaction("math", "builders",    "noads.mlist_to_hlist",      nil, "notail")
 
 local actions = nodes.tasks.actions("math")
 

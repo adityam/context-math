@@ -20,27 +20,168 @@ local push, pop, back = { "push" }, { "pop" }, { "slot", 1, 0x2215 }
 
 local function negate(main,unicode,basecode)
     local characters = main.characters
-    local basechar = characters[basecode]
-    local ht, wd = basechar.height, basechar.width
-    characters[unicode] = {
-        width    = wd,
-        height   = ht,
-        depth    = basechar.depth,
-        italic   = basechar.italic,
-        kerns    = basechar.kerns,
-        commands = {
-            { "slot", 1, basecode },
-            push,
-            { "down",    ht/5},
-            { "right", - wd/2},
-            back,
-            push,
-        }
-    }
+    if not characters[unicode] then
+        local basechar = characters[basecode]
+        if basechar then
+            local ht, wd = basechar.height, basechar.width
+            characters[unicode] = {
+                width    = wd,
+                height   = ht,
+                depth    = basechar.depth,
+                italic   = basechar.italic,
+                kerns    = basechar.kerns,
+                commands = {
+                    { "slot", 1, basecode },
+                    push,
+                    { "down",    ht/5},
+                    { "right", - wd/2},
+                    back,
+                    push,
+                }
+            }
+        end
+    end
 end
 
-function fonts.vf.math.alas(main)
+--~ \Umathchardef\braceld="0 "1 "FF07A
+--~ \Umathchardef\bracerd="0 "1 "FF07B
+--~ \Umathchardef\bracelu="0 "1 "FF07C
+--~ \Umathchardef\braceru="0 "1 "FF07D
+
+local function brace(main,unicode,first,rule,left,right,rule,last)
+    local characters = main.characters
+    if not characters[unicode] then
+        characters[unicode] = {
+            horiz_variants = {
+                { extender = 0, glyph = first },
+                { extender = 1, glyph = rule  },
+                { extender = 0, glyph = left  },
+                { extender = 0, glyph = right },
+                { extender = 1, glyph = rule  },
+                { extender = 0, glyph = last  },
+            }
+        }
+    end
+end
+
+local function parent(main,unicode,first,rule,last)
+    local characters = main.characters
+    if not characters[unicode] then
+        characters[unicode] = {
+            horiz_variants = {
+                { extender = 0, glyph = first },
+                { extender = 1, glyph = rule  },
+                { extender = 0, glyph = last  },
+            }
+        }
+    end
+end
+
+local push, pop, step = { "push" }, { "pop" }, 0.2 -- 0.1 is nicer but gives larger files
+
+local function make(main,id,size,n,m)
+    local characters = main.characters
+    local xu = main.parameters.x_height + 0.3*size
+    local xd = 0.3*size
+    local old, upslot, dnslot, uprule, dnrule = 0xFF000+n, 0xFF100+n, 0xFF200+n, 0xFF300+m, 0xFF400+m
+    local c = characters[old]
+    local w, h, d = c.width, c.height, c.depth
+    local thickness = h - d
+    local rulewidth = step*size -- we could use an overlap
+    local slot = { "slot", id, old }
+    local rule = { "rule", thickness, rulewidth  }
+    local up = { "down", -xu }
+    local dn = { "down", xd }
+    local ht, dp = xu + 3*thickness, 0
+    if not characters[uprule] then
+        characters[uprule] = { width = rulewidth, height = ht, depth = dp, commands = { push, up, rule, pop } }
+    end
+    characters[upslot] = { width = w, height = ht, depth = dp, commands = { push, up, slot, pop } }
+    local ht, dp = 0, xd + 3*thickness
+    if not characters[dnrule] then
+        characters[dnrule] = { width = rulewidth, height = ht, depth = dp, commands = { push, dn, rule, pop } }
+    end
+    characters[dnslot] = { width = w, height = ht, depth = dp, commands = { push, dn, slot, pop } }
+end
+
+local function dots(main,id,size,unicode)
+    local characters = main.characters
+    local c = characters[0x002E]
+    local w, h, d = c.width, c.height, c.depth
+    local mu = size/18
+    local right3mu  = { "right", 3*mu }
+    local right1mu  = { "right", 1*mu }
+    local up1size   = { "down", -.1*size }
+    local up4size   = { "down", -.4*size }
+    local up7size   = { "down", -.7*size }
+    local right2muw = { "right", 2*mu + w }
+    local slot = { "slot", id, 0x002E }
+    if unicode == 0x22EF then
+        local c = characters[0x022C5]
+        local w, h, d = c.width, c.height, c.depth
+        local slot = { "slot", id, 0x022C5 }
+        characters[unicode] = {
+            width = 3*w + 2*3*mu, height = h, depth = d,
+            commands = { push, slot, right3mu, slot, right3mu, slot, pop }
+        }
+    elseif unicode == 0x22EE then
+        -- weird height !
+        characters[unicode] = {
+            width = w, height = h+(1.4)*size, depth = 0,
+            commands = { push, push, slot, pop, up4size, push, slot, pop, up4size, slot, pop }
+        }
+    elseif unicode == 0x22F1 then
+        characters[unicode] = {
+            width = 3*w + 6*size/18, height = 1.5*size, depth = 0,
+            commands = {
+                push,
+                    right1mu,
+                    push, up7size, slot, pop,
+                    right2muw,
+                    push, up4size, slot, pop,
+                    right2muw,
+                    push, up1size, slot, pop,
+                    right1mu,
+                pop
+            }
+        }
+    elseif unicode == 0x22F0 then
+        characters[unicode] = {
+            width = 3*w + 6*size/18, height = 1.5*size, depth = 0,
+            commands = {
+                push,
+                    right1mu,
+                    push, up1size, slot, pop,
+                    right2muw,
+                    push, up4size, slot, pop,
+                    right2muw,
+                    push, up7size, slot, pop,
+                    right1mu,
+                pop
+            }
+        }
+    else
+        characters[unicode] = {
+            width = 3*w + 2*3*mu, height = h, depth = d,
+            commands = { push, slot, right3mu, slot, right3mu, slot, pop }
+        }
+    end
+end
+
+function fonts.vf.math.alas(main,id,size)
+    for i=0x7A,0x7D do
+        make(main,id,size,i,1)
+    end
+    brace (main,0x23DE,0xFF17A,0xFF301,0xFF17D,0xFF17C,0xFF301,0xFF17B)
+    brace (main,0x23DF,0xFF27C,0xFF401,0xFF27B,0xFF27A,0xFF401,0xFF27D)
+    parent(main,0x23DC,0xFF17A,0xFF301,0xFF17B)
+    parent(main,0x23DD,0xFF27C,0xFF401,0xFF27D)
     negate(main,0x2260,0x003D)
+    dots(main,id,size,0x2026) -- ldots
+    dots(main,id,size,0x22EE) -- vdots
+    dots(main,id,size,0x22EF) -- cdots
+    dots(main,id,size,0x22F1) -- ddots
+    dots(main,id,size,0x22F0) -- udots
 end
 
 local reverse -- index -> unicode
@@ -60,6 +201,7 @@ function fonts.vf.math.define(specification,set)
     local size = specification.size -- given size
     local fnt, lst, main = { }, { }, nil
     local start = (trace_virtual or trace_timings) and os.clock()
+--~ texio.write_nl("defining font " .. name .. " " .. size)
     for s=1,#set do
         local ss = set[s]
         local ssname = ss.name
@@ -79,7 +221,9 @@ function fonts.vf.math.define(specification,set)
             end
         end
     end
-    main = table.copy(fnt[main or 1])
+    -- beware, fnt[1] is already passed to tex (we need to make a simple copy then .. todo)
+    -- main = table.copy(fnt[main or 1]) -- needed? aren't these already copies?
+    main = fnt[1]
     main.name, main.fonts, main.virtualized, main.math_parameters = name, lst, true, { }
     local characters, descriptions = main.characters, main.descriptions
     main.parameters.x_height = main.parameters.x_height or 0
@@ -120,57 +264,129 @@ function fonts.vf.math.define(specification,set)
             end
             local vectorname = ss.vector
             if vectorname then
+                local offset = 0xFF000
                 local vector = fonts.enc.math[vectorname]
                 local rotcev = reverse[vectorname]
                 if vector then
                     local fc, fd, si = fs.characters, fs.descriptions, shared[s]
+                    local skewchar = ss.skewchar
+                    for unicode, index in next, vector do
+                        local fci = fc[index]
+                        if not fci then
+                            logs.report("math virtual", "unicode point U+%04X has no index %04X in %s",unicode,index,vectorname)
+                        else
+                            local ref = si[index]
+                            if not ref then
+                                ref = { { 'slot', s, index } }
+                                si[index] = ref
+                            end
+                            local kerns = fci.kerns
+                            if kerns then
+                                local width = fci.width
+                                local krn = { }
+                                for k=1,#kerns do
+                                    local rk = rotcev[k]
+                                    if rk then
+                                        krn[rk] = kerns[k]
+                                    end
+                                end
+                                local t = {
+                                    width    = width,
+                                    height   = fci.height,
+                                    depth    = fci.depth,
+                                    italic   = fci.italic,
+                                    kerns    = krn,
+                                    commands = ref,
+                                }
+                                if skewchar and kerns then
+                                    local k = kerns[skewchar]
+                                    if k then
+                                        t.top_accent = width/2 + k
+                                    end
+                                end
+                                characters[unicode] = t
+                            else
+                                characters[unicode] = {
+                                    width    = fci.width,
+                                    height   = fci.height,
+                                    depth    = fci.depth,
+                                    italic   = fci.italic,
+                                    commands = ref,
+                                }
+                            end
+                        end
+                    end
                     if ss.extension then
+                        -- todo: if multiple ex, then 256 offsets per instance
                         local extension = fonts.enc.math["large-to-small"]
+                        local variants_done = fs.variants_done
                         for index, fci in next, fc do -- the raw ex file
                             local ref = si[index]
                             if not ref then
                                 ref = { { 'slot', s, index } }
                                 si[index] = ref
                             end
+                            local t = {
+                                width    = fci.width,
+                                height   = fci.height,
+                                depth    = fci.depth,
+                                italic   = fci.italic,
+                                commands = ref,
+                            }
                             local n = fci.next
                             if n then
-                                characters[0xFF000 + index] = {
-                                    width    = fci.width,
-                                    height   = fci.height,
-                                    depth    = fci.depth,
-                                    next     = 0xFF000 + n,
-                                    commands = ref,
-                                }
+                                t.next = offset + n
+                            elseif variants_done then
+                                local vv = fci.vert_variants
+                                if vv then
+                                    t.vert_variants = vv
+                                end
+                                local hv = fci.horiz_variants
+                                if hv then
+                                    t.horiz_variants = hv
+                                end
                             else
-                                local e = fci.extensible
-                                if e then
-                                    local top = e.top if top ~= 0 then top = top + 0xFF000 else top = nil end
-                                    local rep = e.rep if rep ~= 0 then rep = rep + 0xFF000 else rep = nil end
-                                    local mid = e.mid if mid ~= 0 then mid = mid + 0xFF000 else mid = nil end
-                                    local bot = e.bot if bot ~= 0 then bot = bot + 0xFF000 else bot = nil end
-                                    characters[0xFF000 + index] = {
-                                        width      = fci.width,
-                                        height     = fci.height,
-                                        depth      = fci.depth,
-                                        extensible = { top = top, rep = rep, mid = mid, bot = bot },
-                                        commands   = ref,
-                                    }
-                                else
-                                    characters[0xFF000 + index] = {
-                                        width    = fci.width,
-                                        height   = fci.height,
-                                        depth    = fci.depth,
-                                        commands = ref,
-                                    }
+                                local vv = fci.vert_variants
+                                if vv then
+                                    for i=1,#vv do
+                                        local vvi = vv[i]
+                                        vvi.glyph = vvi.glyph + offset
+                                    end
+                                    t.vert_variants = vv
+                                end
+                                local hv = fci.horiz_variants
+                                if hv then
+                                    for i=1,#hv do
+                                        local hvi = hv[i]
+                                        hvi.glyph = hvi.glyph + offset
+                                    end
+                                    t.horiz_variants = hv
                                 end
                             end
+                            characters[offset + index] = t
                         end
+                        fs.variants_done = true
                         for unicode, index in next, extension do
                             local cu = characters[unicode]
                             if cu then
-                                cu["next"] = 0xFF000 + index
+                                cu.next = offset + index
+                                --~ local n, c, d = unicode, cu, { }
+                                --~ print("START", unicode)
+                                --~ while n do
+                                --~     n = c.next
+                                --~     if n then
+                                --~         print("NEXT", n)
+                                --~         c = characters[n]
+                                --~         if not c then
+                                --~             print("EXIT")
+                                --~         elseif d[n] then
+                                --~             print("LOOP")
+                                --~             break
+                                --~         end
+                                --~         d[n] = true
+                                --~     end
+                                --~ end
                             else
-                            --  logs.report("math virtual", "no unicode point U+%04X for extensible U+%04X",unicode,index)
                                 local fci = fc[index]
                                 local ref = si[index]
                                 if not ref then
@@ -181,7 +397,7 @@ function fonts.vf.math.define(specification,set)
                                 if kerns then
                                     local krn = { }
                                     for k=1,#kerns do
-                                        krn[0xFF000 + k] = kerns[k]
+                                        krn[offset + k] = kerns[k]
                                     end
                                     characters[unicode] = {
                                         width    = fci.width,
@@ -190,7 +406,7 @@ function fonts.vf.math.define(specification,set)
                                         italic   = fci.italic,
                                         commands = ref,
                                         kerns    = krn,
-                                        next     = 0xFF000 + index,
+                                        next     = offset + index,
                                     }
                                 else
                                     characters[unicode] = {
@@ -199,53 +415,10 @@ function fonts.vf.math.define(specification,set)
                                         depth    = fci.depth,
                                         italic   = fci.italic,
                                         commands = ref,
-                                        next     = 0xFF000 + index,
+                                        next     = offset + index,
                                     }
                                 end
                             end
-                        end
-                    end
-                    local skewchar = ss.skewchar
-                    for unicode, index in next, vector do
-                        local fci = fc[index]
-                        local ref = si[index]
-                        if not ref then
-                            ref = { { 'slot', s, index } }
-                            si[index] = ref
-                        end
-                        local kerns = fci.kerns
-                        if kerns then
-                            local width = fci.width
-                            local krn = { }
-                            for k=1,#kerns do
-                                local rk = rotcev[k]
-                                if rk then
-                                    krn[rk] = kerns[k]
-                                end
-                            end
-                            local t = {
-                                width    = width,
-                                height   = fci.height,
-                                depth    = fci.depth,
-                                italic   = fci.italic,
-                                kerns    = krn,
-                                commands = ref,
-                            }
-                            if skewchar and kerns then
-                                local k = kerns[skewchar]
-                                if k then
-                                    t.top_accent = width/2 + k
-                                end
-                            end
-                            characters[unicode] = t
-                        else
-                            characters[unicode] = {
-                                width    = fci.width,
-                                height   = fci.height,
-                                depth    = fci.depth,
-                                italic   = fci.italic,
-                                commands = ref,
-                            }
                         end
                     end
                 end
@@ -253,13 +426,14 @@ function fonts.vf.math.define(specification,set)
             mathematics.extras.copy(main) --not needed here (yet)
         end
     end
-    fonts.vf.math.alas(main)
+    lst[#lst+1] = { id = font.nextid(), size = size }
+    fonts.vf.math.alas(main,#lst,size)
     if trace_virtual or trace_timings then
         logs.report("math virtual","loading and virtualizing font %s at size %s took %0.3f seconds",name,size,os.clock()-start)
     end
     main.type = "virtual" -- not needed
+    main.parameters.space = 0 -- else we get problems with missing italic correction due to pending textfont 1 testing
     main.MathConstants = fonts.tfm.scaled_math_parameters(main.math_parameters,1)
---~ print(main.fontname,main.fullname,table.serialize(main.MathConstants),main.parameters.x_height)
     return main
 end
 
@@ -286,7 +460,7 @@ fonts.enc.math["large-to-small"] = {
     [0x027E9] = 0x0B, -- >
     [0x0007C] = 0x0C, -- |
 --~ [0x0]     = 0x0D, -- lVert rVert Vert
-    [0x0002F] = 0x0E, -- /
+--  [0x0002F] = 0x0E, -- /
     [0x0005C] = 0x0F, -- \
 --~ [0x0]     = 0x3A, -- lgroup
 --~ [0x0]     = 0x3B, -- rgroup
@@ -301,21 +475,28 @@ fonts.enc.math["large-to-small"] = {
     [0x02193] = 0x79, -- downarrow
     [0x021D1] = 0x7E, -- Uparrow
     [0x021D3] = 0x7F, -- Downarrow
+    [0x0220F] = 0x59, -- prod
+    [0x0222B] = 0x5A, -- intop
+    [0x02210] = 0x61, -- coprod
+    [0x02211] = 0x58, -- sum
+    [0xFE302] = 0x62, -- widehat
+    [0xFE303] = 0x65, -- widetilde
+    [0x022C0] = 0x5E, -- bigwedge
+    [0x022C1] = 0x5F, -- bigvee
+    [0x022C2] = 0x5C, -- bigcap
+    [0x022C3] = 0x5B, -- bigcup
+    [0x02044] = 0x0E, -- /
+}
+
+fonts.enc.math["traditional-ex"] = {
     [0x0220F] = 0x51, -- prod
     [0x0222B] = 0x52, -- intop
     [0x02210] = 0x60, -- coprod
     [0x02211] = 0x50, -- sum
-    [0xFE302] = 0x62, -- widehat
-    [0xFE303] = 0x65, -- widetilde
     [0x022C0] = 0x56, -- bigwedge
     [0x022C1] = 0x57, -- bigvee
     [0x022C2] = 0x54, -- bigcap
     [0x022C3] = 0x53, -- bigcup
-    [0x02215] = 0x3D, -- /
-}
-
-fonts.enc.math["traditional-ex"] = {
-    -- no characters
 }
 
 -- only math stuff is needed, since we always use an lm or gyre
@@ -426,9 +607,7 @@ fonts.enc.math["traditional-mi"] = {
     --          0x2C, -- lhook (hook for combining arrows)
     --          0x2D, -- rhook (hook for combining arrows)
     [0x022B3] = 0x2E, -- triangleright (TODO: which one is right?)
-    [0x025B7] = 0x2E, -- triangleright
     [0x022B2] = 0x2F, -- triangleleft (TODO: which one is right?)
-    [0x025C1] = 0x2F, -- triangleleft
 --  [0x00041] = 0x30, -- 0
 --  [0x00041] = 0x31, -- 1
 --  [0x00041] = 0x32, -- 2
@@ -439,11 +618,11 @@ fonts.enc.math["traditional-mi"] = {
 --  [0x00041] = 0x37, -- 7
 --  [0x00041] = 0x38, -- 8
 --  [0x00041] = 0x39, -- 9
-    [0x0002E] = 0x3A, -- .
+--~     [0x0002E] = 0x3A, -- .
     [0x0002C] = 0x3B, -- ,
     [0x0003C] = 0x3C, -- <
-    [0x0002F] = 0x3D, -- /, slash, solidus
-    [0x02215] = 0x3D, -- / AM: Not sure
+--  [0x0002F] = 0x3D, -- /, slash, solidus
+    [0x02044] = 0x3D, -- / AM: Not sure
     [0x0003E] = 0x3E, -- >
     [0x022C6] = 0x3F, -- star
     [0x02202] = 0x40, -- partial
@@ -500,6 +679,7 @@ fonts.enc.math["traditional-mi"] = {
 --  [0x00066] = 0x66, -- f
 --  [0x00067] = 0x67, -- g
 --  [0x00068] = 0x68, -- h
+    [0x0210E] = 0x68, -- plant constant
 --  [0x00069] = 0x69, -- i
 --  [0x0006A] = 0x6A, -- j
 --  [0x0006B] = 0x6B, -- k
@@ -526,36 +706,60 @@ fonts.enc.math["traditional-mi"] = {
 --              0x7F, -- (no idea what that could be)
 }
 
-fonts.enc.math["traditional-ss"] = { }
-fonts.enc.math["traditional-tt"] = { }
-fonts.enc.math["traditional-bf"] = { }
-fonts.enc.math["traditional-bi"] = { }
+fonts.enc.math["traditional-ss"]           = { }
+fonts.enc.math["traditional-tt"]           = { }
+fonts.enc.math["traditional-bf"]           = { }
+fonts.enc.math["traditional-bi"]           = { }
+fonts.enc.math["traditional-fraktur"]      = { }
+fonts.enc.math["traditional-fraktur-bold"] = { }
 
-local mi_vec = fonts.enc.math["traditional-mi"]
-local ss_vec = fonts.enc.math["traditional-ss"]
-local tt_vec = fonts.enc.math["traditional-tt"]
-local bf_vec = fonts.enc.math["traditional-bf"]
-local bi_vec = fonts.enc.math["traditional-bi"]
+-- local mi_vec           = fonts.enc.math["traditional-mi"]
+-- local ss_vec           = fonts.enc.math["traditional-ss"]
+-- local tt_vec           = fonts.enc.math["traditional-tt"]
+-- local bf_vec           = fonts.enc.math["traditional-bf"]
+-- local bi_vec           = fonts.enc.math["traditional-bi"]
+-- local fraktur_vec      = fonts.enc.math["traditional-fraktur"]
+-- local fraktur_bold_vec = fonts.enc.math["traditional-fraktur-bold"]
 
-for i=0,25 do
-    local u, l = i + 0x41, i + 0x61
-    mi_vec[0x1D434+i] = u
-    mi_vec[0x1D44E+i] = l
-    ss_vec[0x1D5A0+i] = u
-    ss_vec[0x1D5BA+i] = l
-    tt_vec[0x1D670+i] = u
-    tt_vec[0x1D68A+i] = l
-    bf_vec[0x1D400+i] = u
-    bf_vec[0x1D41A+i] = l
-    bi_vec[0x1D468+i] = u
-    bi_vec[0x1D482+i] = l
+-- for i=0,25 do
+--     local u, l = i + 0x41, i + 0x61
+--     mi_vec[0x1D434+i]           = u
+--     mi_vec[0x1D44E+i]           = l
+--     ss_vec[0x1D5A0+i]           = u
+--     ss_vec[0x1D5BA+i]           = l
+--     tt_vec[0x1D670+i]           = u
+--     tt_vec[0x1D68A+i]           = l
+--     bf_vec[0x1D400+i]           = u
+--     bf_vec[0x1D41A+i]           = l
+--     bi_vec[0x1D468+i]           = u
+--     bi_vec[0x1D482+i]           = l
+--     fraktur_vec[0x1D504+i]      = u
+--     fraktur_vec[0x1D51E+i]      = l
+--     fraktur_bold_vec[0x1D56C+i] = u
+--     fraktur_bold_vec[0x1D586+i] = l
+-- end
+
+-- for i=0,9 do
+--     ss_vec[0x1D7E2+i] = i + 0x30
+--     tt_vec[0x1D7F6+i] = i + 0x30
+--     bf_vec[0x1D7CE+i] = i + 0x30
+-- --  bi_vec[0x1D7CE+i] = i + 0x30
+-- end
+
+
+function fonts.vf.math.set_letters(font_encoding, name, uppercase, lowercase)
+    local enc = font_encoding[name]
+    for i = 0,25 do
+        enc[uppercase+i] = i + 0x41
+        enc[lowercase+i] = i + 0x61
+    end
 end
 
-for i=0,9 do
-    ss_vec[0x1D7E2+i] = i + 0x30
-    tt_vec[0x1D7F6+i] = i + 0x30
-    bf_vec[0x1D7CE+i] = i + 0x30
---  bi_vec[0x1D7CE+i] = i + 0x30
+function fonts.vf.math.set_digits(font_encoding, name, digits)
+    local enc = font_encoding[name]
+    for i = 0,9 do
+        enc[digits+i] = i + 0x30
+    end
 end
 
 fonts.enc.math["traditional-sy"] = {
@@ -564,7 +768,7 @@ fonts.enc.math["traditional-sy"] = {
 --  [0x02201] = 0x00, -- complement
 --  [0x02206] = 0x00, -- increment
 --  [0x02204] = 0x00, -- not exists
-    [0x000B7] = 0x01, -- cdot
+--~     [0x000B7] = 0x01, -- cdot
     [0x022C5] = 0x01, -- cdot
     [0x000D7] = 0x02, -- times
     [0x0002A] = 0x03, -- *
@@ -578,7 +782,7 @@ fonts.enc.math["traditional-sy"] = {
     [0x02297] = 0x0A, -- otimes
     [0x02298] = 0x0B, -- oslash
     [0x02299] = 0x0C, -- odot
---  [0x0]     = 0x0D, -- bigcirc, Orb (either 25EF or 25CB)
+    [0x025EF] = 0x0D, -- bigcirc, Orb (either 25EF or 25CB) -- todo
     [0x02218] = 0x0E, -- circ
     [0x02219] = 0x0F, -- bullet
     [0x02022] = 0x0F, -- bullet
@@ -616,7 +820,7 @@ fonts.enc.math["traditional-sy"] = {
     [0x02196] = 0x2D, -- nwarrow
     [0x02199] = 0x2E, -- swarrow
     [0x0221D] = 0x2F, -- propto
---  [0x02032] = 0x30, -- prime (not really the right symbol)
+    [0x02032] = 0x30, -- prime
     [0x0221E] = 0x31, -- infty
     [0x02208] = 0x32, -- in
     [0x0220B] = 0x33, -- ni
@@ -684,7 +888,7 @@ fonts.enc.math["traditional-sy"] = {
     [0x0221A] = 0x70, -- sqrt. AM: Check surd??
     [0x02A3F] = 0x71, -- amalg
     [0x02207] = 0x72, -- nabla
-    [0x0222B] = 0x73, -- smallint (TODO: what about intop?)
+--  [0x0222B] = 0x73, -- smallint (TODO: what about intop?)
     [0x02294] = 0x74, -- sqcup
     [0x02293] = 0x75, -- sqcap
     [0x02291] = 0x76, -- sqsubseteq
@@ -733,6 +937,7 @@ fonts.enc.math["traditional-ma"] = {
     [0x021A3] = 0x1A, -- arrowtailright        \rightarrowtail
     [0x021A2] = 0x1B, -- arrowtailleft         \leftarrowtail
     [0x021C6] = 0x1C, -- arrowparrleftright    \leftrightarrows
+--  [0x021C5] = 0x00, --                       \updownarrows (missing in lm)
     [0x021C4] = 0x1D, -- arrowparrrightleft    \rightleftarrows
     [0x021B0] = 0x1E, -- shiftleft             \Lsh
     [0x021B1] = 0x1F, -- shiftright            \Rsh
@@ -927,7 +1132,7 @@ fonts.enc.math["traditional-mb"] = {
     [0x1D54E] = 0x57, -- W
     [0x1D54F] = 0x58, -- X
     [0x1D550] = 0x59, -- Y
-    [0x02124] = 0x5A, -- Z                     (blackboard A)
+    [0x02124] = 0x5A, -- Z                     (blackboard Z)
     [0x02132] = 0x60, -- hatwide               \Finv
     [0x02141] = 0x61, -- hatwider              \Game
     --  [0x0] = 0x62,    tildewide
@@ -962,6 +1167,76 @@ fonts.enc.math["traditional-mb"] = {
     [0x003F6] = 0x7F, -- epsiloninv            \backepsilon
 }
 
+fonts.enc.math["traditional-fraktur"] = {
+--  [0x1D504] = 0x41, -- A                     (fraktur A)
+--  [0x1D505] = 0x42, -- B
+    [0x0212D] = 0x43, -- C
+--  [0x1D507] = 0x44, -- D
+--  [0x1D508] = 0x45, -- E
+--  [0x1D509] = 0x46, -- F
+--  [0x1D50A] = 0x47, -- G
+    [0x0210C] = 0x48, -- H
+    [0x02111] = 0x49, -- I
+--  [0x1D50D] = 0x4A, -- J
+--  [0x1D50E] = 0x4B, -- K
+--  [0x1D50F] = 0x4C, -- L
+--  [0x1D510] = 0x4D, -- M
+--  [0x1D511] = 0x4E, -- N
+--  [0x1D512] = 0x4F, -- O
+--  [0x1D513] = 0x50, -- P
+--  [0x1D514] = 0x51, -- Q
+    [0x0211C] = 0x52, -- R
+--  [0x1D516] = 0x53, -- S
+--  [0x1D517] = 0x54, -- T
+--  [0x1D518] = 0x55, -- U
+--  [0x1D519] = 0x56, -- V
+--  [0x1D51A] = 0x57, -- W
+--  [0x1D51B] = 0x58, -- X
+--  [0x1D51C] = 0x59, -- Y
+    [0x02128] = 0x5A, -- Z                     (fraktur Z)
+--  [0x1D51E] = 0x61, -- a                     (fraktur a)
+--  [0x1D51F] = 0x62, -- b
+--  [0x1D520] = 0x63, -- c
+--  [0x1D521] = 0x64, -- d
+--  [0x1D522] = 0x65, -- e
+--  [0x1D523] = 0x66, -- f
+--  [0x1D524] = 0x67, -- g
+--  [0x1D525] = 0x68, -- h
+--  [0x1D526] = 0x69, -- i
+--  [0x1D527] = 0x6A, -- j
+--  [0x1D528] = 0x6B, -- k
+--  [0x1D529] = 0x6C, -- l
+--  [0x1D52A] = 0x6D, -- m
+--  [0x1D52B] = 0x6E, -- n
+--  [0x1D52C] = 0x6F, -- o
+--  [0x1D52D] = 0x70, -- p
+--  [0x1D52E] = 0x71, -- q
+--  [0x1D52F] = 0x72, -- r
+--  [0x1D530] = 0x73, -- s
+--  [0x1D531] = 0x74, -- t
+--  [0x1D532] = 0x75, -- u
+--  [0x1D533] = 0x76, -- v
+--  [0x1D534] = 0x77, -- w
+--  [0x1D535] = 0x78, -- x
+--  [0x1D536] = 0x79, -- y
+--  [0x1D537] = 0x7A, -- z
+}
+
+-- Should be placed after all other vectors are defined.
+fonts.vf.math.set_letters(fonts.enc.math, "traditional-mi", 0x1D434, 0x1D44E)
+fonts.vf.math.set_letters(fonts.enc.math, "traditional-ss", 0x1D5A0, 0x1D5BA)
+fonts.vf.math.set_letters(fonts.enc.math, "traditional-tt", 0x1D670, 0x1D68A)
+fonts.vf.math.set_letters(fonts.enc.math, "traditional-bf", 0x1D400, 0x1D41A)
+fonts.vf.math.set_letters(fonts.enc.math, "traditional-bi", 0x1D468, 0x1D482)
+fonts.vf.math.set_letters(fonts.enc.math, "traditional-fraktur", 0x1D504, 0x1D51E)
+fonts.vf.math.set_letters(fonts.enc.math, "traditional-fraktur-bold", 0x1D56C, 0x1D586)
+
+fonts.vf.math.set_digits (fonts.enc.math, "traditional-ss", 0x1D7E2)
+fonts.vf.math.set_digits (fonts.enc.math, "traditional-tt", 0x1D7F6)
+fonts.vf.math.set_digits (fonts.enc.math, "traditional-bf", 0x1D7CE)
+-- fonts.vf.math.set_digits (fonts.enc.math, "traditional-bi", 0x1D7CE)
+
+
 -- todo: add ss, tt, bf etc vectors
 -- we can make ss tt etc an option
 
@@ -974,16 +1249,18 @@ fonts.enc.math["traditional-mb"] = {
 
 mathematics.make_font ( "lmroman5-math", {
     { name = "lmroman5-regular", features = "virtualmath", main = true },
-    { name = "rm-lmr5", vector = "traditional-mr" } ,
+ -- { name = "rm-lmr5", vector = "traditional-mr" } ,
     { name = "lmmi5", vector = "traditional-mi", skewchar=0x7F },
     { name = "lmsy5", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10", vector = "traditional-ex", extension = true } ,
     { name = "msam5", vector = "traditional-ma" },
     { name = "msbm5", vector = "traditional-mb" },
+ -- { name = "rm-lmbx5", vector = "traditional-bf" } ,
+    { name = "lmroman5-bold", "traditional-bf" } ,
+    { name = "lmmib5", vector = "traditional-bi", skewchar=0x7F } ,
     { name = "lmsans8-regular", vector = "traditional-ss", optional=true },
     { name = "lmmono8-regular", vector = "traditional-tt", optional=true },
-    { name = "rm-lmbx5", vector = "traditional-bf" } ,
-    { name = "lmmib5", vector = "traditional-bi", skewchar=0x7F } ,
+    { name = "eufm5", vector = "traditional-fraktur", optional=true },
 } )
 
 -- rm-lmr6  : LMMathRoman6-Regular
@@ -993,16 +1270,19 @@ mathematics.make_font ( "lmroman5-math", {
 
 mathematics.make_font ( "lmroman6-math", {
     { name = "lmroman6-regular", features = "virtualmath", main = true },
-    { name = "rm-lmr6", vector = "traditional-mr" } ,
+ -- { name = "rm-lmr6", vector = "traditional-mr" } ,
     { name = "lmmi6", vector = "traditional-mi", skewchar=0x7F },
     { name = "lmsy6", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10", vector = "traditional-ex", extension = true } ,
     { name = "msam5", vector = "traditional-ma" },
     { name = "msbm5", vector = "traditional-mb" },
+ -- { name = "rm-lmbx6", vector = "traditional-bf" } ,
+    { name = "lmroman6-bold", "traditional-bf" } ,
+    { name = "lmmib5", vector = "traditional-bi", skewchar=0x7F } ,
     { name = "lmsans8-regular", vector = "traditional-ss", optional=true },
     { name = "lmmono8-regular", vector = "traditional-tt", optional=true },
-    { name = "rm-lmbx6", vector = "traditional-bf" } ,
-    { name = "lmmib5", vector = "traditional-bi", skewchar=0x7F } ,
+    { name = "eufm6", vector = "traditional-fraktur", optional=true },
+    { name = "eufb6", vector = "traditional-fraktur-bold", optional=true },
 } )
 
 -- rm-lmr7  : LMMathRoman7-Regular
@@ -1014,16 +1294,19 @@ mathematics.make_font ( "lmroman6-math", {
 
 mathematics.make_font ( "lmroman7-math", {
     { name = "lmroman7-regular", features = "virtualmath", main = true },
-    { name = "rm-lmr7", vector = "traditional-mr" } ,
+ -- { name = "rm-lmr7", vector = "traditional-mr" } ,
     { name = "lmmi7", vector = "traditional-mi", skewchar=0x7F },
     { name = "lmsy7", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10", vector = "traditional-ex", extension = true } ,
     { name = "msam7", vector = "traditional-ma" },
     { name = "msbm7", vector = "traditional-mb" },
+ -- { name = "rm-lmbx7", vector = "traditional-bf" } ,
+    { name = "lmroman7-bold", "traditional-bf" } ,
+    { name = "lmmib7", vector = "traditional-bi", skewchar=0x7F } ,
     { name = "lmsans8-regular", vector = "traditional-ss", optional=true },
     { name = "lmmono8-regular", vector = "traditional-tt", optional=true },
-    { name = "rm-lmbx7", vector = "traditional-bf" } ,
-    { name = "lmmib7", vector = "traditional-bi", skewchar=0x7F } ,
+    { name = "eufm7", vector = "traditional-fraktur", optional=true },
+    { name = "eufb7", vector = "traditional-fraktur-bold", optional=true },
 } )
 
 -- rm-lmr8  : LMMathRoman8-Regular
@@ -1033,16 +1316,19 @@ mathematics.make_font ( "lmroman7-math", {
 
 mathematics.make_font ( "lmroman8-math", {
     { name = "lmroman8-regular", features = "virtualmath", main = true },
-    { name = "rm-lmr8", vector = "traditional-mr" } ,
+ -- { name = "rm-lmr8", vector = "traditional-mr" } ,
     { name = "lmmi8", vector = "traditional-mi", skewchar=0x7F },
     { name = "lmsy8", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10", vector = "traditional-ex", extension = true } ,
     { name = "msam7", vector = "traditional-ma" },
     { name = "msbm7", vector = "traditional-mb" },
+ -- { name = "rm-lmbx8", vector = "traditional-bf" } ,
+    { name = "lmroman8-bold", "traditional-bf" } ,
+    { name = "lmmib7", vector = "traditional-bi", skewchar=0x7F } ,
     { name = "lmsans8-regular", vector = "traditional-ss", optional=true },
     { name = "lmmono8-regular", vector = "traditional-tt", optional=true },
-    { name = "rm-lmbx8", vector = "traditional-bf" } ,
-    { name = "lmmib7", vector = "traditional-bi", skewchar=0x7F } ,
+    { name = "eufm8", vector = "traditional-fraktur", optional=true },
+    { name = "eufb8", vector = "traditional-fraktur-bold", optional=true },
 } )
 
 -- rm-lmr9  : LMMathRoman9-Regular
@@ -1052,16 +1338,19 @@ mathematics.make_font ( "lmroman8-math", {
 
 mathematics.make_font ( "lmroman9-math", {
     { name = "lmroman9-regular", features = "virtualmath", main = true },
-    { name = "rm-lmr9", vector = "traditional-mr" } ,
+ -- { name = "rm-lmr9", vector = "traditional-mr" } ,
     { name = "lmmi9", vector = "traditional-mi", skewchar=0x7F },
     { name = "lmsy9", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10", vector = "traditional-ex", extension = true } ,
     { name = "msam10", vector = "traditional-ma" },
     { name = "msbm10", vector = "traditional-mb" },
-    { name = "rm-lmbx9", vector = "traditional-bf" } ,
+ -- { name = "rm-lmbx9", vector = "traditional-bf" } ,
+    { name = "lmroman9-bold", "traditional-bf" } ,
     { name = "lmmib10", vector = "traditional-bi", skewchar=0x7F } ,
     { name = "lmsans9-regular", vector = "traditional-ss", optional=true },
     { name = "lmmono9-regular", vector = "traditional-tt", optional=true },
+    { name = "eufm9", vector = "traditional-fraktur", optional=true },
+    { name = "eufb9", vector = "traditional-fraktur-bold", optional=true },
 } )
 
 -- rm-lmr10  : LMMathRoman10-Regular
@@ -1074,16 +1363,19 @@ mathematics.make_font ( "lmroman9-math", {
 
 mathematics.make_font ( "lmroman10-math", {
     { name = "lmroman10-regular", features = "virtualmath", main = true },
-    { name = "rm-lmr10", vector = "traditional-mr" } ,
+ -- { name = "rm-lmr10", vector = "traditional-mr" } ,
     { name = "lmmi10", vector = "traditional-mi", skewchar=0x7F },
     { name = "lmsy10", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10", vector = "traditional-ex", extension = true } ,
     { name = "msam10", vector = "traditional-ma" },
     { name = "msbm10", vector = "traditional-mb" },
-    { name = "rm-lmbx10", vector = "traditional-bf" } ,
+ -- { name = "rm-lmbx10", vector = "traditional-bf" } ,
+    { name = "lmroman10-bold", "traditional-bf" } ,
     { name = "lmmib10", vector = "traditional-bi", skewchar=0x7F } ,
     { name = "lmsans10-regular", vector = "traditional-ss", optional=true },
     { name = "lmmono10-regular", vector = "traditional-tt", optional=true },
+    { name = "eufm10", vector = "traditional-fraktur", optional=true },
+    { name = "eufb10", vector = "traditional-fraktur-bold", optional=true },
 } )
 
 -- rm-lmr12  : LMMathRoman12-Regular
@@ -1092,32 +1384,38 @@ mathematics.make_font ( "lmroman10-math", {
 
 mathematics.make_font ( "lmroman12-math", {
     { name = "lmroman12-regular", features = "virtualmath", main = true },
-    { name = "rm-lmr12", vector = "traditional-mr" } ,
+ -- { name = "rm-lmr12", vector = "traditional-mr" } ,
     { name = "lmmi12", vector = "traditional-mi", skewchar=0x7F },
-    { name = "lmsy12", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
+    { name = "lmsy10", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10", vector = "traditional-ex", extension = true } ,
     { name = "msam10", vector = "traditional-ma" },
     { name = "msbm10", vector = "traditional-mb" },
-    { name = "rm-lmbx12", vector = "traditional-bf" } ,
+ -- { name = "rm-lmbx12", vector = "traditional-bf" } ,
+    { name = "lmroman12-bold", "traditional-bf" } ,
     { name = "lmmib10", vector = "traditional-bi", skewchar=0x7F } ,
     { name = "lmsans12-regular", vector = "traditional-ss", optional=true },
     { name = "lmmono12-regular", vector = "traditional-tt", optional=true },
+    { name = "eufm10", vector = "traditional-fraktur", optional=true },
+    { name = "eufb10", vector = "traditional-fraktur-bold", optional=true },
 } )
 
 -- rm-lmr17 : LMMathRoman17-Regular
 
 mathematics.make_font ( "lmroman17-math", {
     { name = "lmroman17-regular", features = "virtualmath", main = true },
-    { name = "rm-lmr12", vector = "traditional-mr" } ,
+ -- { name = "rm-lmr12", vector = "traditional-mr" } ,
     { name = "lmmi12", vector = "traditional-mi", skewchar=0x7F },
-    { name = "lmsy12", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
+    { name = "lmsy10", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10", vector = "traditional-ex", extension = true } ,
     { name = "msam10", vector = "traditional-ma" },
     { name = "msbm10", vector = "traditional-mb" },
-    { name = "rm-lmbx12", vector = "traditional-bf" } ,
+ -- { name = "rm-lmbx12", vector = "traditional-bf" } ,
+    { name = "lmroman12-bold", "traditional-bf" } ,
     { name = "lmmib10", vector = "traditional-bi", skewchar=0x7F } ,
     { name = "lmsans17-regular", vector = "traditional-ss", optional=true },
     { name = "lmmono17-regular", vector = "traditional-tt", optional=true },
+    { name = "eufm10", vector = "traditional-fraktur", optional=true },
+    { name = "eufb10", vector = "traditional-fraktur-bold", optional=true },
 } )
 
 -- pxr/txr messes up the accents
@@ -1140,4 +1438,40 @@ mathematics.make_font ( "tx-math", {
     { name = "txex", vector = "traditional-ex", extension = true } ,
     { name = "txsya", vector = "traditional-ma" },
     { name = "txsyb", vector = "traditional-mb" },
+} )
+
+mathematics.make_font ( "iwona-math", {
+    { name = "file:Iwona-Regular", features = "virtualmath", main = true },
+    { name = "mi-iwonari", vector = "traditional-mi", skewchar=0x7F },
+    { name = "sy-iwonarz", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
+    { name = "ex-iwonar", vector = "traditional-ex", extension = true } ,
+    { name = "msam10", vector = "traditional-ma" },
+    { name = "msbm10", vector = "traditional-mb" },
+} )
+
+mathematics.make_font ( "iwona-light-math", {
+    { name = "file:IwonaLight-Regular", features = "virtualmath", main = true },
+    { name = "mi-iwonali", vector = "traditional-mi", skewchar=0x7F },
+    { name = "sy-iwonalz", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
+    { name = "ex-iwonal", vector = "traditional-ex", extension = true } ,
+    { name = "msam10", vector = "traditional-ma" },
+    { name = "msbm10", vector = "traditional-mb" },
+} )
+
+mathematics.make_font ( "iwona-medium-math", {
+    { name = "file:IwonaMedium-Regular", features = "virtualmath", main = true },
+    { name = "mi-iwonami", vector = "traditional-mi", skewchar=0x7F },
+    { name = "sy-iwonamz", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
+    { name = "ex-iwonam", vector = "traditional-ex", extension = true } ,
+    { name = "msam10", vector = "traditional-ma" },
+    { name = "msbm10", vector = "traditional-mb" },
+} )
+
+mathematics.make_font ( "iwona-heavy-math", {
+    { name = "file:IwonaHeavy-Regular", features = "virtualmath", main = true },
+    { name = "mi-iwonahi", vector = "traditional-mi", skewchar=0x7F },
+    { name = "sy-iwonahz", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
+    { name = "ex-iwonah", vector = "traditional-ex", extension = true } ,
+    { name = "msam10", vector = "traditional-ma" },
+    { name = "msbm10", vector = "traditional-mb" },
 } )

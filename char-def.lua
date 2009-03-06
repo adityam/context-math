@@ -266,6 +266,7 @@ characters.data={
   contextname="quotedbl",
   description="QUOTATION MARK",
   direction="on",
+  mathclass="default",
   linebreak="qu",
   unicodeslot=0x0022,
  },
@@ -315,6 +316,7 @@ characters.data={
   description="APOSTROPHE",
   direction="on",
   linebreak="qu",
+  mathclass="default",
   unicodeslot=0x0027,
  },
  {
@@ -349,6 +351,7 @@ characters.data={
   direction="on",
   linebreak="al",
   mathclass="binary",
+  mathname="ast",
   unicodeslot=0x002A,
  },
  {
@@ -369,6 +372,10 @@ characters.data={
   direction="cs",
   linebreak="is",
   mathclass="punctuation",
+  mathspec={
+    { class="punctuation", name="textcomma" },
+    { class="ord", name="mathcomma" },
+  },
   unicodeslot=0x002C,
  },
  {
@@ -378,7 +385,6 @@ characters.data={
   description="HYPHEN-MINUS",
   direction="es",
   linebreak="hy",
---mathclass="binary",
   mathsymbol=0x2212,
   unicodeslot=0x002D,
  },
@@ -389,7 +395,12 @@ characters.data={
   description="FULL STOP",
   direction="cs",
   linebreak="is",
-  mathclass="punctuation",
+  mathclass="ord",
+  mathspec={
+    { class="ord", name="mathperiod" },
+    { class="punctuation", name="textperiod" },
+    { class="punctuation", name="ldotp" },
+  },
   unicodeslot=0x002E,
  },
  {
@@ -400,11 +411,7 @@ characters.data={
   description="SOLIDUS",
   direction="cs",
   linebreak="sy",
-  mathspec={
-   { class="binary", name="slash" },
-   { class="close", name="solidus" },
-  },
-  mathclass="binary",
+  mathsymbol=0x2044,
   unicodeslot=0x002F,
  },
  {
@@ -515,6 +522,7 @@ characters.data={
   direction="cs",
   linebreak="is",
   mathclass="punctuation",
+  mathname="colon",
   unicodeslot=0x003A,
  },
  {
@@ -887,7 +895,8 @@ characters.data={
   description="REVERSE SOLIDUS",
   direction="on",
   linebreak="pr",
-  mathclass="binary",
+  mathclass="nothing",
+  mathname="backslash",
   unicodeslot=0x005C,
  },
  {
@@ -1245,7 +1254,8 @@ characters.data={
   linebreak="ba",
   mathspec={
 -- { class="binary", name="bar" },
-   { class="nothing", name="vert" },
+   { class="nothing", name="arrowvert" },
+   { class="delimiter", name="vert" },
    { class="open", name="lvert" },
    { class="close", name="rvert" },
    { class="relation", name="mid" },
@@ -1763,6 +1773,7 @@ characters.data={
   direction="on",
   linebreak="ai",
   mathclass="binary",
+  mathname="centerdot",
   unicodeslot=0x00B7,
  },
  {
@@ -7310,7 +7321,7 @@ characters.data={
   direction="on",
   linebreak="ai",
   mathclass="accent",
-  mathname="ring",
+  mathname="mathring",
   specials={ "compat", 0x0020, 0x030A },
   unicodeslot=0x02DA,
  },
@@ -8059,7 +8070,7 @@ characters.data={
   description="COMBINING LONG SOLIDUS OVERLAY",
   direction="nsm",
   linebreak="cm",
-  mathclass="default",
+  mathclass="relation",
   mathname="not",
   unicodeslot=0x0338,
  },
@@ -48968,6 +48979,8 @@ characters.data={
   description="HORIZONTAL ELLIPSIS",
   direction="on",
   linebreak="in",
+  mathclass="inner",
+  mathname="ldots",
   specials={ "compat", 0x002E, 0x002E, 0x002E },
   unicodeslot=0x2026,
  },
@@ -49212,6 +49225,10 @@ characters.data={
   description="FRACTION SLASH",
   direction="cs",
   linebreak="is",
+  mathspec={
+   { class="binary", name="slash" },
+   { class="close", name="solidus" },
+  },
   unicodeslot=0x2044,
  },
  [0x2045]={
@@ -50029,6 +50046,10 @@ characters.data={
   description="COMBINING ENCLOSING CIRCLE",
   direction="nsm",
   linebreak="cm",
+  mathspec={
+    { class="default",name="bigcircle" },
+    { class="binary",name="bigcircle" },
+  },
   unicodeslot=0x20DD,
  },
  [0x20DE]={
@@ -50036,6 +50057,8 @@ characters.data={
   description="COMBINING ENCLOSING SQUARE",
   direction="nsm",
   linebreak="cm",
+  mathclass="default",
+  mathname="bigsquare",
   unicodeslot=0x20DE,
  },
  [0x20DF]={
@@ -50043,6 +50066,8 @@ characters.data={
   description="COMBINING ENCLOSING DIAMOND",
   direction="nsm",
   linebreak="cm",
+  mathclass="default",
+  mathname="bigdiamond",
   unicodeslot=0x20DF,
  },
  [0x20E0]={
@@ -50113,6 +50138,7 @@ characters.data={
   description="COMBINING WIDE BRIDGE ABOVE",
   direction="nsm",
   linebreak="cm",
+  mathclass="accent",
   unicodeslot=0x20E9,
  },
  [0x20EA]={
@@ -51348,6 +51374,8 @@ characters.data={
   mathspec={
    { class="relation", name="leftarrow" },
    { class="relation", name="gets" },
+   { class="under", name="underleftarrow" },
+   { class="over", name="overleftarrow" },
   },
   mathstretch="h",
   unicodeslot=0x2190,
@@ -51370,10 +51398,11 @@ characters.data={
   description="RIGHTWARDS ARROW",
   direction="on",
   linebreak="ai",
---mathfiller="rightarrowfill",
   mathspec={
-    { class="relation",name="rightarrow" },
-    { class="relation",name="to" },
+   { class="relation",name="rightarrow" },
+   { class="relation",name="to" },
+   { class="under", name="underrightarrow" },
+   { class="over", name="overrightarrow" },
   },
   mathstretch="h",
   unicodeslot=0x2192,
@@ -51476,6 +51505,8 @@ characters.data={
   description="LEFTWARDS WAVE ARROW",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="leftsquigarrow",
   unicodeslot=0x219C,
  },
  [0x219D]={
@@ -51483,6 +51514,10 @@ characters.data={
   description="RIGHTWARDS WAVE ARROW",
   direction="on",
   linebreak="al",
+  mathspec={
+    { class="relation",name="rightsquigarrow" },
+    { class="relation",name="leadsto" },
+  },
   unicodeslot=0x219D,
  },
  [0x219E]={
@@ -51554,6 +51589,9 @@ characters.data={
   description="RIGHTWARDS ARROW FROM BAR",
   direction="on",
   linebreak="al",
+  fallback=[[\mapstochar\rightarrow]],
+  mathclass="relation",
+  mathname="mapsto",
   unicodeslot=0x21A6,
  },
  [0x21A7]={
@@ -51576,6 +51614,9 @@ characters.data={
   description="LEFTWARDS ARROW WITH HOOK",
   direction="on",
   linebreak="al",
+  fallback=[[\leftarrow\joinrel\rhook]],
+  mathclass="relation",
+  mathname="hookleftarrow",
   unicodeslot=0x21A9,
  },
  [0x21AA]={
@@ -51583,6 +51624,9 @@ characters.data={
   description="RIGHTWARDS ARROW WITH HOOK",
   direction="on",
   linebreak="al",
+  fallback=[[\lhook\joinrel\rightarrow]],
+  mathclass="relation",
+  mathname="hookrightarrow",
   unicodeslot=0x21AA,
  },
  [0x21AB]={
@@ -51634,6 +51678,8 @@ characters.data={
   description="UPWARDS ARROW WITH TIP LEFTWARDS",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="Lsh",
   unicodeslot=0x21B0,
  },
  [0x21B1]={
@@ -51641,6 +51687,8 @@ characters.data={
   description="UPWARDS ARROW WITH TIP RIGHTWARDS",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="Rsh",
   unicodeslot=0x21B1,
  },
  [0x21B2]={
@@ -51747,8 +51795,10 @@ characters.data={
   description="UPWARDS HARPOON WITH BARB RIGHTWARDS",
   direction="on",
   linebreak="al",
-  mathclass="relation",
-  mathname="upharpoonright",
+  mathspec={
+    { class="relation", name="upharpoonright" },
+    { class="relation", name="restriction" },
+  },
   unicodeslot=0x21BE,
  },
  [0x21BF]={
@@ -51766,7 +51816,7 @@ characters.data={
   direction="on",
   linebreak="al",
   mathclass="relation",
-  mathname="righttharpoonup",
+  mathname="rightharpoonup",
   unicodeslot=0x21C0,
  },
  [0x21C1]={
@@ -51810,6 +51860,8 @@ characters.data={
   description="UPWARDS ARROW LEFTWARDS OF DOWNWARDS ARROW",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="updownarrows",
   unicodeslot=0x21C5,
  },
  [0x21C6]={
@@ -52340,8 +52392,6 @@ characters.data={
   description="NABLA",
   direction="on",
   linebreak="ai",
-  mathclass="default",
-  mathname="nabla",
   unicodeslot=0x2207,
  },
  [0x2208]={
@@ -52381,8 +52431,10 @@ characters.data={
   description="CONTAINS AS MEMBER",
   direction="on",
   linebreak="ai",
-  mathclass="relation",
-  mathname="ni",
+  mathspec={
+   { class="relation", name="ni" },
+   { class="relation", name="owns" },
+  },
   mirror=0x2208,
   unicodeslot=0x220B,
  },
@@ -52421,12 +52473,12 @@ characters.data={
   mathname="prod",
   unicodeslot=0x220F,
  },
- [0x2210]={
+[0x2210]={
   category="sm",
   description="N-ARY COPRODUCT",
   direction="on",
   linebreak="al",
-  mathclass="relation",
+  mathclass="limop",
   mathname="coprod",
   unicodeslot=0x2210,
  },
@@ -52622,6 +52674,7 @@ characters.data={
   mathspec={
    { class="relation", name="parallel" },
    { class="nothing", name="Vert" },
+   { class="nothing", name="Arrowvert" },
    { class="open", name="lVert" },
    { class="close", name="rVert" },
   },
@@ -52717,6 +52770,8 @@ characters.data={
   description="CONTOUR INTEGRAL",
   direction="on",
   linebreak="ai",
+  mathclass="limop",
+  mathname="ointop",
   unicodeslot=0x222E,
  },
  [0x222F]={
@@ -52763,6 +52818,8 @@ characters.data={
   description="THEREFORE",
   direction="on",
   linebreak="ai",
+  mathclass="relation",
+  mathname="therefore",
   unicodeslot=0x2234,
  },
  [0x2235]={
@@ -52771,6 +52828,8 @@ characters.data={
   description="BECAUSE",
   direction="on",
   linebreak="ai",
+  mathclass="relation",
+  mathname="because",
   unicodeslot=0x2235,
  },
  [0x2236]={
@@ -52999,6 +53058,10 @@ characters.data={
   description="GEOMETRICALLY EQUAL TO",
   direction="on",
   linebreak="al",
+  mathspec={
+    { class="relation", name="doteqdot" },
+    { class="relation", name="Doteq" },
+  },
   unicodeslot=0x2251,
  },
  [0x2252]={
@@ -53008,6 +53071,8 @@ characters.data={
   direction="on",
   linebreak="ai",
   mirror=0x2253,
+  mathclass="relation",
+  mathname="fallingdotseq",
   unicodeslot=0x2252,
  },
  [0x2253]={
@@ -53016,6 +53081,8 @@ characters.data={
   direction="on",
   linebreak="al",
   mirror=0x2252,
+  mathclass="relation",
+  mathname="risingdotseq",
   unicodeslot=0x2253,
  },
  [0x2254]={
@@ -53039,6 +53106,8 @@ characters.data={
   description="RING IN EQUAL TO",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="eqcirc",
   unicodeslot=0x2256,
  },
  [0x2257]={
@@ -53046,6 +53115,8 @@ characters.data={
   description="RING EQUAL TO",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="circeq",
   unicodeslot=0x2257,
  },
  [0x2258]={
@@ -53246,6 +53317,8 @@ characters.data={
   description="BETWEEN",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="between",
   unicodeslot=0x226C,
  },
  [0x226D]={
@@ -53830,6 +53903,9 @@ characters.data={
   description="MODELS",
   direction="on",
   linebreak="al",
+  fallback=[[\mathrel|\joinrel=]],
+  mathclass="relation",
+  mathname="models",
   unicodeslot=0x22A7,
  },
  [0x22A8]={
@@ -53838,6 +53914,8 @@ characters.data={
   direction="on",
   linebreak="al",
   mirror=0x2AE4,
+  mathclass="relation",
+  mathname="vDash",
   unicodeslot=0x22A8,
  },
  [0x22A9]={
@@ -53846,6 +53924,8 @@ characters.data={
   direction="on",
   linebreak="al",
   mirror=0x2AE3,
+  mathclass="relation",
+  mathname="Vdash",
   unicodeslot=0x22A9,
  },
  [0x22AA]={
@@ -53853,6 +53933,8 @@ characters.data={
   description="TRIPLE VERTICAL BAR RIGHT TURNSTILE",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="Vvdash",
   unicodeslot=0x22AA,
  },
  [0x22AB]={
@@ -53861,6 +53943,8 @@ characters.data={
   direction="on",
   linebreak="al",
   mirror=0x2AE5,
+  mathclass="relation",
+  mathname="VDash",
   unicodeslot=0x22AB,
  },
  [0x22AC]={
@@ -53868,6 +53952,8 @@ characters.data={
   description="DOES NOT PROVE",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="nvdash",
   specials={ "char", 0x22A2, 0x0338 },
   unicodeslot=0x22AC,
  },
@@ -53876,6 +53962,8 @@ characters.data={
   description="NOT TRUE",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="nvDash",
   specials={ "char", 0x22A8, 0x0338 },
   unicodeslot=0x22AD,
  },
@@ -53884,6 +53972,8 @@ characters.data={
   description="DOES NOT FORCE",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="nVdash",
   specials={ "char", 0x22A9, 0x0338 },
   unicodeslot=0x22AE,
  },
@@ -53892,6 +53982,8 @@ characters.data={
   description="NEGATED DOUBLE VERTICAL BAR DOUBLE RIGHT TURNSTILE",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="nVDash",
   specials={ "char", 0x22AB, 0x0338 },
   unicodeslot=0x22AF,
  },
@@ -53916,6 +54008,8 @@ characters.data={
   description="NORMAL SUBGROUP OF",
   direction="on",
   linebreak="al",
+  mathclass="bin",
+  mathname="triangleleft",
   mirror=0x22B3,
   unicodeslot=0x22B2,
  },
@@ -53924,6 +54018,8 @@ characters.data={
   description="CONTAINS AS NORMAL SUBGROUP",
   direction="on",
   linebreak="al",
+  mathclass="bin",
+  mathname="triangleright",
   mirror=0x22B2,
   unicodeslot=0x22B3,
  },
@@ -53964,6 +54060,8 @@ characters.data={
   description="MULTIMAP",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="multimap",
   unicodeslot=0x22B8,
  },
  [0x22B9]={
@@ -53985,6 +54083,8 @@ characters.data={
   description="XOR",
   direction="on",
   linebreak="al",
+  mathclass="binary",
+  mathname="veebar",
   unicodeslot=0x22BB,
  },
  [0x22BC]={
@@ -53992,6 +54092,8 @@ characters.data={
   description="NAND",
   direction="on",
   linebreak="al",
+  mathclass="binary",
+  mathname="barwedge",
   unicodeslot=0x22BC,
  },
  [0x22BD]={
@@ -54067,8 +54169,10 @@ characters.data={
   description="DOT OPERATOR",
   direction="on",
   linebreak="al",
-  mathclass="binary",
-  mathname="cdot",
+  mathspec={
+    { class="binary", name="cdot" },
+    { class="punctuation", name="cdotp" },
+  },
   unicodeslot=0x22C5,
  },
  [0x22C6]={
@@ -54092,6 +54196,9 @@ characters.data={
   description="BOWTIE",
   direction="on",
   linebreak="al",
+  fallback=[[\mathrel\triangleright\joinrel\mathrel\triangleleft]],
+  mathclass="relation",
+  mathname="bowtie",
   unicodeslot=0x22C8,
  },
  [0x22C9]={
@@ -54230,6 +54337,8 @@ characters.data={
   direction="on",
   linebreak="al",
   mirror=0x22DB,
+  mathclass="relation",
+  mathname="lesseqgtr",
   unicodeslot=0x22DA,
  },
  [0x22DB]={
@@ -54238,6 +54347,8 @@ characters.data={
   direction="on",
   linebreak="al",
   mirror=0x22DA,
+  mathclass="relation",
+  mathname="gtreqless",
   unicodeslot=0x22DB,
  },
  [0x22DC]={
@@ -54262,6 +54373,8 @@ characters.data={
   direction="on",
   linebreak="al",
   mirror=0x22DF,
+  mathclass="relation",
+  mathname="curlyeqprec",
   unicodeslot=0x22DE,
  },
  [0x22DF]={
@@ -54270,6 +54383,8 @@ characters.data={
   direction="on",
   linebreak="al",
   mirror=0x22DE,
+  mathclass="relation",
+  mathname="curlyeqsucc",
   unicodeslot=0x22DF,
  },
  [0x22E0]={
@@ -54397,6 +54512,8 @@ characters.data={
   description="VERTICAL ELLIPSIS",
   direction="on",
   linebreak="al",
+  mathclass="inner",
+  mathname="vdots",
   unicodeslot=0x22EE,
  },
  [0x22EF]={
@@ -54404,6 +54521,8 @@ characters.data={
   description="MIDLINE HORIZONTAL ELLIPSIS",
   direction="on",
   linebreak="al",
+  mathclass="inner",
+  mathname="cdots",
   unicodeslot=0x22EF,
  },
  [0x22F0]={
@@ -54411,6 +54530,8 @@ characters.data={
   description="UP RIGHT DIAGONAL ELLIPSIS",
   direction="on",
   linebreak="al",
+  mathclass="inner",
+  mathname="udots",
   mirror=0x22F1,
   unicodeslot=0x22F0,
  },
@@ -54419,6 +54540,8 @@ characters.data={
   description="DOWN RIGHT DIAGONAL ELLIPSIS",
   direction="on",
   linebreak="al",
+  mathclass="inner",
+  mathname="ddots",
   mirror=0x22F0,
   unicodeslot=0x22F1,
  },
@@ -55796,6 +55919,8 @@ characters.data={
   description="UPPER LEFT OR LOWER RIGHT CURLY BRACKET SECTION",
   direction="on",
   linebreak="al",
+  mathclass="open",
+  mathname="lmoustache",
   unicodeslot=0x23B0,
  },
  [0x23B1]={
@@ -55803,6 +55928,8 @@ characters.data={
   description="UPPER RIGHT OR LOWER LEFT CURLY BRACKET SECTION",
   direction="on",
   linebreak="al",
+  mathclass="close",
+  mathname="rmoustache",
   unicodeslot=0x23B1,
  },
  [0x23B2]={
@@ -56104,6 +56231,8 @@ characters.data={
   description="TOP PARENTHESIS",
   direction="on",
   linebreak="al",
+  mathclass="topaccent",
+  mathname="overparent",
   unicodeslot=0x23DC,
  },
  [0x23DD]={
@@ -56111,6 +56240,8 @@ characters.data={
   description="BOTTOM PARENTHESIS",
   direction="on",
   linebreak="al",
+  mathclass="botaccent",
+  mathname="underparent",
   unicodeslot=0x23DD,
  },
  [0x23DE]={
@@ -56118,6 +56249,8 @@ characters.data={
   description="TOP CURLY BRACKET",
   direction="on",
   linebreak="al",
+  mathclass="topaccent",
+  mathname="overbrace",
   unicodeslot=0x23DE,
  },
  [0x23DF]={
@@ -56125,6 +56258,8 @@ characters.data={
   description="BOTTOM CURLY BRACKET",
   direction="on",
   linebreak="al",
+  mathclass="botaccent",
+  mathname="underbrace",
   unicodeslot=0x23DF,
  },
  [0x23E0]={
@@ -56132,6 +56267,7 @@ characters.data={
   description="TOP TORTOISE SHELL BRACKET",
   direction="on",
   linebreak="al",
+  mathclass="accent",
   unicodeslot=0x23E0,
  },
  [0x23E1]={
@@ -56139,6 +56275,7 @@ characters.data={
   description="BOTTOM TORTOISE SHELL BRACKET",
   direction="on",
   linebreak="al",
+  mathclass="accent",
   unicodeslot=0x23E1,
  },
  [0x23E2]={
@@ -59319,8 +59456,10 @@ characters.data={
   description="WHITE SQUARE",
   direction="on",
   linebreak="ai",
-  mathclass="ord",
-  mathname="square",
+  mathspec={
+   { class="ord", name="square" },
+   { class="ord", name="Box" },
+  },
   unicodeslot=0x25A1,
  },
  [0x25A2]={
@@ -59496,8 +59635,6 @@ characters.data={
   description="WHITE RIGHT-POINTING TRIANGLE",
   direction="on",
   linebreak="ai",
-  mathclass="bin",
-  mathname="triangleright",
   unicodeslot=0x25B7,
  },
  [0x25B8]={
@@ -59576,8 +59713,6 @@ characters.data={
   description="WHITE LEFT-POINTING TRIANGLE",
   direction="on",
   linebreak="ai",
-  mathclass="bin",
-  mathname="triangleleft",
   unicodeslot=0x25C1,
  },
  [0x25C2]={
@@ -59646,6 +59781,8 @@ characters.data={
   description="LOZENGE",
   direction="on",
   linebreak="al",
+  mathclass="ord",
+  mathname="lozenge",
   unicodeslot=0x25CA,
  },
  [0x25CB]={
@@ -59920,6 +60057,8 @@ characters.data={
   description="LARGE CIRCLE",
   direction="on",
   linebreak="ai",
+  mathclass="binary",
+  mathname="bigcirc",
   unicodeslot=0x25EF,
  },
  [0x25F0]={
@@ -60075,6 +60214,8 @@ characters.data={
   description="BLACK STAR",
   direction="on",
   linebreak="ai",
+  mathclass="ord",
+  mathname="bigstar",
   unicodeslot=0x2605,
  },
  [0x2606]={
@@ -62900,6 +63041,9 @@ characters.data={
   description="LONG LEFTWARDS ARROW",
   direction="on",
   linebreak="al",
+  fallback=[[\leftarrow\joinrel\relbar]],
+  mathclass="relation",
+  mathname="longleftarrow",
   unicodeslot=0x27F5,
  },
  [0x27F6]={
@@ -62907,6 +63051,9 @@ characters.data={
   description="LONG RIGHTWARDS ARROW",
   direction="on",
   linebreak="al",
+  fallback=[[\relbar\joinrel\rightarrow]],
+  mathclass="relation",
+  mathname="longrightarrow",
   unicodeslot=0x27F6,
  },
  [0x27F7]={
@@ -62914,6 +63061,9 @@ characters.data={
   description="LONG LEFT RIGHT ARROW",
   direction="on",
   linebreak="al",
+  fallback=[[\leftarrow\joinrel\rightarrow]],
+  mathclass="relation",
+  mathname="longleftrightarrow",
   unicodeslot=0x27F7,
  },
  [0x27F8]={
@@ -62921,6 +63071,9 @@ characters.data={
   description="LONG LEFTWARDS DOUBLE ARROW",
   direction="on",
   linebreak="al",
+  fallback=[[\Leftarrow\joinrel\Relbar]],
+  mathclass="relation",
+  mathname="Longleftarrow",
   unicodeslot=0x27F8,
  },
  [0x27F9]={
@@ -62928,6 +63081,9 @@ characters.data={
   description="LONG RIGHTWARDS DOUBLE ARROW",
   direction="on",
   linebreak="al",
+  fallback=[[\Relbar\joinrel\Rightarrow]],
+  mathclass="relation",
+  mathname="Longrightarrow",
   unicodeslot=0x27F9,
  },
  [0x27FA]={
@@ -62935,6 +63091,9 @@ characters.data={
   description="LONG LEFT RIGHT DOUBLE ARROW",
   direction="on",
   linebreak="al",
+  fallback=[[\Leftarrow\joinrel\Rightarrow]],
+  mathclass="relation",
+  mathname="Longleftrightarrow",
   unicodeslot=0x27FA,
  },
  [0x27FB]={
@@ -62942,6 +63101,9 @@ characters.data={
   description="LONG LEFTWARDS ARROW FROM BAR",
   direction="on",
   linebreak="al",
+  fallback=[[\longleftarrow\mapstochar]], -- untested
+  mathclass="relation",
+  mathname="longmapsfrom",
   unicodeslot=0x27FB,
  },
  [0x27FC]={
@@ -62949,6 +63111,9 @@ characters.data={
   description="LONG RIGHTWARDS ARROW FROM BAR",
   direction="on",
   linebreak="al",
+  fallback=[[\mapstochar\longrightarrow]],
+  mathclass="relation",
+  mathname="longmapsto",
   unicodeslot=0x27FC,
  },
  [0x27FD]={
@@ -66453,6 +66618,8 @@ characters.data={
   description="BLACK LOZENGE",
   direction="on",
   linebreak="al",
+  mathclass="ord",
+  mathname="blacklozenge",
   unicodeslot=0x29EB,
  },
  [0x29EC]={
@@ -66612,6 +66779,8 @@ characters.data={
   description="N-ARY CIRCLED PLUS OPERATOR",
   direction="on",
   linebreak="al",
+  mathclass="limop",
+  mathname="bigoplus",
   unicodeslot=0x2A01,
  },
  [0x2A02]={
@@ -66619,6 +66788,8 @@ characters.data={
   description="N-ARY CIRCLED TIMES OPERATOR",
   direction="on",
   linebreak="al",
+  mathclass="limop",
+  mathname="bigotimes",
   unicodeslot=0x2A02,
  },
  [0x2A03]={
@@ -66626,6 +66797,8 @@ characters.data={
   description="N-ARY UNION OPERATOR WITH DOT",
   direction="on",
   linebreak="al",
+  mathclass="limop",
+  mathname="bigodot",
   unicodeslot=0x2A03,
  },
  [0x2A04]={
@@ -66633,6 +66806,8 @@ characters.data={
   description="N-ARY UNION OPERATOR WITH PLUS",
   direction="on",
   linebreak="al",
+  mathclass="limop",
+  mathname="biguplus",
   unicodeslot=0x2A04,
  },
  [0x2A05]={
@@ -66640,6 +66815,8 @@ characters.data={
   description="N-ARY SQUARE INTERSECTION OPERATOR",
   direction="on",
   linebreak="al",
+  mathclass="limop",
+  mathname="bigsqcap",
   unicodeslot=0x2A05,
  },
  [0x2A06]={
@@ -66647,6 +66824,8 @@ characters.data={
   description="N-ARY SQUARE UNION OPERATOR",
   direction="on",
   linebreak="al",
+  mathclass="limop",
+  mathname="bigsqcup",
   unicodeslot=0x2A06,
  },
  [0x2A07]={
@@ -66668,6 +66847,8 @@ characters.data={
   description="N-ARY TIMES OPERATOR",
   direction="on",
   linebreak="al",
+  mathclass="limop",
+  mathname="bigtimes",
   unicodeslot=0x2A09,
  },
  [0x2A0A]={
@@ -75096,6 +75277,8 @@ characters.data={
   direction="on",
   linebreak="op",
   mirror=0x3015,
+  mathclass="open",
+  mathname="lgroup",
   unicodeslot=0x3014,
  },
  [0x3015]={
@@ -75105,6 +75288,8 @@ characters.data={
   direction="on",
   linebreak="cl",
   mirror=0x3014,
+  mathclass="close",
+  mathname="rgroup",
   unicodeslot=0x3015,
  },
  [0x3016]={
@@ -104249,7 +104434,7 @@ characters.data={
   description="PRESENTATION FORM FOR VERTICAL LEFT CURLY BRACKET",
   direction="on",
   linebreak="op",
-  mathfiller="downbracefill",
+  mathfiller="downbracefill", -- funny, chinese, no math, wrong but for the moment we need it for buggy mathml
   specials={ "vertical", 0x007B },
   unicodeslot=0xFE37,
  },
@@ -104259,7 +104444,7 @@ characters.data={
   description="PRESENTATION FORM FOR VERTICAL RIGHT CURLY BRACKET",
   direction="on",
   linebreak="cl",
-  mathfiller="upbracefill",
+  mathfiller="upbracefill", -- funny, chinese, no math, wrong but for the moment we need it for buggy mathml
   specials={ "vertical", 0x007D },
   unicodeslot=0xFE38,
  },
@@ -114037,6 +114222,8 @@ characters.data={
   description="CUNEIFORM SIGN ARAD TIMES KUR",
   direction="l",
   linebreak="al",
+  mathclass="ord",
+  mathname="backprime",
   unicodeslot=0x12035,
  },
  [0x12036]={
@@ -130983,6 +131170,8 @@ characters.data={
   description="MATHEMATICAL ITALIC NABLA",
   direction="l",
   linebreak="al",
+  mathclass="default",
+  mathname="nabla",
   specials={ "font", 0x2207 },
   unicodeslot=0x1D6FB,
  },

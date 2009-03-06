@@ -94,6 +94,28 @@ mathematics.extras.add(0xFE303, {
     nextinsize={ 0x00303, 0x0007E },
 } )
 
+--~ mathematics.extras.add(0xFE304, {
+--~   category="sm",
+--~   description="TOP AND BOTTOM PARENTHESES",
+--~   direction="on",
+--~   linebreak="al",
+--~   mathclass="doubleaccent",
+--~   mathname="doubleparent",
+--~   unicodeslot=0xFE304,
+--~   accents={ 0x023DC, 0x023DD },
+--~ } )
+
+--~ mathematics.extras.add(0xFE305, {
+--~   category="sm",
+--~   description="TOP AND BOTTOM BRACES",
+--~   direction="on",
+--~   linebreak="al",
+--~   mathclass="doubleaccent",
+--~   mathname="doublebrace",
+--~   unicodeslot=0xFE305,
+--~   accents={ 0x023DE, 0x023DF },
+--~ } )
+
 --~ \Umathchardef\braceld="0 "1 "FF07A
 --~ \Umathchardef\bracerd="0 "1 "FF07B
 --~ \Umathchardef\bracelu="0 "1 "FF07C
