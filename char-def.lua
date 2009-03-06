@@ -51505,8 +51505,6 @@ characters.data={
   description="LEFTWARDS WAVE ARROW",
   direction="on",
   linebreak="al",
-  mathclass="relation",
-  mathname="leftsquigarrow",
   unicodeslot=0x219C,
  },
  [0x219D]={
@@ -51514,10 +51512,6 @@ characters.data={
   description="RIGHTWARDS WAVE ARROW",
   direction="on",
   linebreak="al",
-  mathspec={
-    { class="relation",name="rightsquigarrow" },
-    { class="relation",name="leadsto" },
-  },
   unicodeslot=0x219D,
  },
  [0x219E]={
@@ -51652,8 +51646,6 @@ characters.data={
   description="LEFT RIGHT WAVE ARROW",
   direction="on",
   linebreak="al",
-  mathclass="relation",
-  mathname="leftrightsquigarrow",
   unicodeslot=0x21AD,
  },
  [0x21AE]={
@@ -52069,6 +52061,8 @@ characters.data={
   description="LEFTWARDS SQUIGGLE ARROW",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="leftsquigarrow",
   unicodeslot=0x21DC,
  },
  [0x21DD]={
@@ -52076,6 +52070,10 @@ characters.data={
   description="RIGHTWARDS SQUIGGLE ARROW",
   direction="on",
   linebreak="al",
+  mathspec={
+    { class="relation",name="rightsquigarrow" },
+    { class="relation",name="leadsto" },
+  },
   unicodeslot=0x21DD,
  },
  [0x21DE]={

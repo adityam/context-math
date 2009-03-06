@@ -901,6 +901,7 @@ fonts.enc.math["traditional-sy"] = {
     [0x02662] = 0x7D, -- diamondsuit
     [0x02661] = 0x7E, -- heartsuit
     [0x02660] = 0x7F, -- spadesuit
+    [0xFE321] = 0x37, -- mapstochar
 }
 
 -- The names in masm10.enc can be trusted best and are shown in the first

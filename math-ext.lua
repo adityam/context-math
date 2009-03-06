@@ -69,6 +69,8 @@ function mathematics.extras.copy(tfmdata)
     end
 end
 
+-- 0xFE302 -- 0xFE320 for accents
+
 mathematics.extras.add(0xFE302, {
     category="mn",
     description="WIDE MATHEMATICAL HAT",
@@ -92,6 +94,18 @@ mathematics.extras.add(0xFE303, {
     mathstretch="h",
     unicodeslot=0xFE303,
     nextinsize={ 0x00303, 0x0007E },
+} )
+
+-- 0xFE321 -- 0xFE340 for missing characters
+
+mathematics.extras.add(0xFE321, {
+    category="sm",
+    description="SHORT BAR",
+--  direction="on",
+--  linebreak="nu",
+    mathclass="relation",
+    mathname="mapstochar",
+    unicodeslot=0xFE321,
 } )
 
 --~ mathematics.extras.add(0xFE304, {
