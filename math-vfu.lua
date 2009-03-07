@@ -501,7 +501,7 @@ fonts.enc.math["traditional-ex"] = {
     [0x02A02] = 0x4E, -- bigotimes
     [0x02A01] = 0x4C, -- bigoplus
     [0x02A03] = 0x4A, -- bigodot
-    [0x0222E] = 0x48, -- ointop 
+    [0x0222E] = 0x48, -- ointop
     [0x02A06] = 0x46, -- bigsqcup
 }
 
@@ -1016,7 +1016,7 @@ fonts.enc.math["traditional-ma"] = {
     --  [0x0] = 0x5F, -- proportional          \varpropto
     --  [0x0] = 0x60, -- smile                 \smallsmile
     --  [0x0] = 0x61, -- frown                 \smallfrown
-    [0x022D0] = 0x62, -- subsetdbl             \Subset
+    [0x02282] = 0x62, -- subsetdbl             \Subset
     [0x022D1] = 0x63, -- supersetdbl           \Supset
     [0x022D3] = 0x64, -- uniondbl              \doublecup \Cup
     [0x00100] = 0x65, -- intersectiondbl       \doublecap \Cap
