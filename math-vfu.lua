@@ -6,6 +6,9 @@ if not modules then modules = { } end modules ['math-vfu'] = {
     license   = "see context related readme files"
 }
 
+-- All these math vectors .. thanks to Aditya and Mojca they become
+-- better and better.
+
 local trace_virtual = false trackers.register("math.virtual", function(v) trace_virtual = v end)
 local trace_timings = false trackers.register("math.timings", function(v) trace_timings = v end)
 
@@ -719,40 +722,6 @@ fonts.enc.math["traditional-bi"]           = { }
 fonts.enc.math["traditional-fraktur"]      = { }
 fonts.enc.math["traditional-fraktur-bold"] = { }
 
--- local mi_vec           = fonts.enc.math["traditional-mi"]
--- local ss_vec           = fonts.enc.math["traditional-ss"]
--- local tt_vec           = fonts.enc.math["traditional-tt"]
--- local bf_vec           = fonts.enc.math["traditional-bf"]
--- local bi_vec           = fonts.enc.math["traditional-bi"]
--- local fraktur_vec      = fonts.enc.math["traditional-fraktur"]
--- local fraktur_bold_vec = fonts.enc.math["traditional-fraktur-bold"]
-
--- for i=0,25 do
---     local u, l = i + 0x41, i + 0x61
---     mi_vec[0x1D434+i]           = u
---     mi_vec[0x1D44E+i]           = l
---     ss_vec[0x1D5A0+i]           = u
---     ss_vec[0x1D5BA+i]           = l
---     tt_vec[0x1D670+i]           = u
---     tt_vec[0x1D68A+i]           = l
---     bf_vec[0x1D400+i]           = u
---     bf_vec[0x1D41A+i]           = l
---     bi_vec[0x1D468+i]           = u
---     bi_vec[0x1D482+i]           = l
---     fraktur_vec[0x1D504+i]      = u
---     fraktur_vec[0x1D51E+i]      = l
---     fraktur_bold_vec[0x1D56C+i] = u
---     fraktur_bold_vec[0x1D586+i] = l
--- end
-
--- for i=0,9 do
---     ss_vec[0x1D7E2+i] = i + 0x30
---     tt_vec[0x1D7F6+i] = i + 0x30
---     bf_vec[0x1D7CE+i] = i + 0x30
--- --  bi_vec[0x1D7CE+i] = i + 0x30
--- end
-
-
 function fonts.vf.math.set_letters(font_encoding, name, uppercase, lowercase)
     local enc = font_encoding[name]
     for i = 0,25 do
@@ -1016,7 +985,7 @@ fonts.enc.math["traditional-ma"] = {
     --  [0x0] = 0x5F, -- proportional          \varpropto
     --  [0x0] = 0x60, -- smile                 \smallsmile
     --  [0x0] = 0x61, -- frown                 \smallfrown
-    [0x02282] = 0x62, -- subsetdbl             \Subset
+    [0x022D0] = 0x62, -- subsetdbl             \Subset
     [0x022D1] = 0x63, -- supersetdbl           \Supset
     [0x022D3] = 0x64, -- uniondbl              \doublecup \Cup
     [0x00100] = 0x65, -- intersectiondbl       \doublecap \Cap
@@ -1229,7 +1198,8 @@ fonts.enc.math["traditional-fraktur"] = {
 --  [0x1D537] = 0x7A, -- z
 }
 
--- Should be placed after all other vectors are defined.
+-- now that all other vectors are defined ...
+
 fonts.vf.math.set_letters(fonts.enc.math, "traditional-mi", 0x1D434, 0x1D44E)
 fonts.vf.math.set_letters(fonts.enc.math, "traditional-ss", 0x1D5A0, 0x1D5BA)
 fonts.vf.math.set_letters(fonts.enc.math, "traditional-tt", 0x1D670, 0x1D68A)
@@ -1241,8 +1211,8 @@ fonts.vf.math.set_letters(fonts.enc.math, "traditional-fraktur-bold", 0x1D56C, 0
 fonts.vf.math.set_digits (fonts.enc.math, "traditional-ss", 0x1D7E2)
 fonts.vf.math.set_digits (fonts.enc.math, "traditional-tt", 0x1D7F6)
 fonts.vf.math.set_digits (fonts.enc.math, "traditional-bf", 0x1D7CE)
--- fonts.vf.math.set_digits (fonts.enc.math, "traditional-bi", 0x1D7CE)
 
+-- fonts.vf.math.set_digits (fonts.enc.math, "traditional-bi", 0x1D7CE)
 
 -- todo: add ss, tt, bf etc vectors
 -- we can make ss tt etc an option

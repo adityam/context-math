@@ -315,7 +315,7 @@ nodes.tasks.new (
 
 local actions = nodes.tasks.actions("math")
 
-local starttiming, stoptiming = input.starttiming, input.stoptiming
+local starttiming, stoptiming = statistics.starttiming, statistics.stoptiming
 
 function nodes.processors.mlist_to_hlist(head,style,penalties)
     starttiming(noads)
@@ -325,3 +325,9 @@ function nodes.processors.mlist_to_hlist(head,style,penalties)
 end
 
 callback.register('mlist_to_hlist',nodes.processors.mlist_to_hlist)
+
+-- tracing
+
+statistics.register("math processing time", function()
+    return format("%s seconds", statistics.elapsedtime(noads))
+end)

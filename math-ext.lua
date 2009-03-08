@@ -53,13 +53,13 @@ function mathematics.extras.copy(tfmdata)
                         end
                     end
                 end
-            end
-            if not characters[unicode] then
-                for i=1,#nextinsize do
-                    local nextbase = characters[nextinsize[i]]
-                    if nextbase then
-                        characters[unicode] = nextchar
-                        break
+                if not characters[unicode] then
+                    for i=1,#nextinsize do
+                        local nextbase = characters[nextinsize[i]]
+                        if nextbase then
+                            characters[unicode] = nextchar
+                            break
+                        end
                     end
                 end
             end
@@ -98,15 +98,15 @@ mathematics.extras.add(0xFE303, {
 
 -- 0xFE321 -- 0xFE340 for missing characters
 
-mathematics.extras.add(0xFE321, {
-    category="sm",
-    description="SHORT BAR",
---  direction="on",
---  linebreak="nu",
-    mathclass="relation",
-    mathname="mapstochar",
-    unicodeslot=0xFE321,
-} )
+-- mathematics.extras.add(0xFE321, {
+--     category="sm",
+--     description="SHORT BAR",
+-- --  direction="on",
+-- --  linebreak="nu",
+--     mathclass="relation",
+--     mathname="mapstochar",
+--     unicodeslot=0xFE321,
+-- } )
 
 
 
