@@ -194,8 +194,8 @@
 % \definemathcommand [matrix]    {\PLAINmatrix}
 % \definemathcommand [over]      {\normalover} % hack, to do
 
-\def\{{\lbrace}
-\def\}{\rbrace}
+\unexpanded\def\{{\mathortext\lbrace\letterleftbrace }
+\unexpanded\def\}{\mathortext\rbrace\letterrightbrace}
 
 %D The following colon related definitions are provided by Aditya
 %D Mahajan who derived them from \type {mathtools.sty} and \type
@@ -290,8 +290,6 @@
 \let\normalunderrightarrow\underrightarrow
 \let\normaloverrightarrow \overrightarrow
 
-\def\mathopwithlimits#1#2{\mathop{#1{#2}}\limits}
-
 \unexpanded\def\mathopwithlimits#1#2{\mathop{#1{#2}}\limits}
 \unexpanded\def\stackrel        #1#2{\mathrel{\mathop{#2}\limits^{#1}}}
 
@@ -305,9 +303,6 @@
 \unexpanded\def\overleftarrow  {\mathopwithlimits\normaloverleftarrow  }
 \unexpanded\def\underrightarrow{\mathopwithlimits\normalunderrightarrow}
 \unexpanded\def\overrightarrow {\mathopwithlimits\normaloverrightarrow }
-
-\ifx\{\undefined\else \unexpanded\def\{{\mathortext\lbrace\letterleftbrace } \fi
-\ifx\}\undefined\else \unexpanded\def\}{\mathortext\rbrace\letterrightbrace} \fi
 
 % todo mathclass=punctuation ord
 

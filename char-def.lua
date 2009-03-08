@@ -63185,6 +63185,8 @@ characters.data={
   description="LONG LEFTWARDS DOUBLE ARROW FROM BAR",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="Longmapsfrom",
   unicodeslot=0x27FD,
  },
  [0x27FE]={
@@ -63192,6 +63194,8 @@ characters.data={
   description="LONG RIGHTWARDS DOUBLE ARROW FROM BAR",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="Longmapsto",
   unicodeslot=0x27FE,
  },
  [0x27FF]={
@@ -63199,6 +63203,8 @@ characters.data={
   description="LONG RIGHTWARDS SQUIGGLE ARROW",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="longrightsquigarrow",
   unicodeslot=0x27FF,
  },
  [0x2800]={
@@ -65040,6 +65046,8 @@ characters.data={
   description="LEFTWARDS DOUBLE ARROW FROM BAR",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="Mapsfrom",
   unicodeslot=0x2906,
  },
  [0x2907]={
@@ -65047,6 +65055,8 @@ characters.data={
   description="RIGHTWARDS DOUBLE ARROW FROM BAR",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="Mapsto",
   unicodeslot=0x2907,
  },
  [0x2908]={
@@ -65068,6 +65078,8 @@ characters.data={
   description="UPWARDS TRIPLE ARROW",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="Uuparrow",
   unicodeslot=0x290A,
  },
  [0x290B]={
@@ -65075,6 +65087,8 @@ characters.data={
   description="DOWNWARDS TRIPLE ARROW",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="Ddownarrow",
   unicodeslot=0x290B,
  },
  [0x290C]={
@@ -65082,6 +65096,8 @@ characters.data={
   description="LEFTWARDS DOUBLE DASH ARROW",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="dashedleftarrow",
   unicodeslot=0x290C,
  },
  [0x290D]={
@@ -65089,6 +65105,8 @@ characters.data={
   description="RIGHTWARDS DOUBLE DASH ARROW",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="dashedrightarrow",
   unicodeslot=0x290D,
  },
  [0x290E]={
@@ -65117,6 +65135,8 @@ characters.data={
   description="RIGHTWARDS ARROW WITH DOTTED STEM",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="dottedrightarrow",
   unicodeslot=0x2911,
  },
  [0x2912]={
@@ -65152,6 +65172,8 @@ characters.data={
   description="RIGHTWARDS TWO-HEADED ARROW WITH TAIL",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="twoheadrightarrowtail",
   unicodeslot=0x2916,
  },
  [0x2917]={
@@ -65159,6 +65181,7 @@ characters.data={
   description="RIGHTWARDS TWO-HEADED ARROW WITH TAIL WITH VERTICAL STROKE",
   direction="on",
   linebreak="al",
+  mathclass="relation",
   unicodeslot=0x2917,
  },
  [0x2918]={
@@ -65229,6 +65252,8 @@ characters.data={
   description="NORTH WEST AND SOUTH EAST ARROW",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="nwsearrow",
   unicodeslot=0x2921,
  },
  [0x2922]={
@@ -65236,6 +65261,8 @@ characters.data={
   description="NORTH EAST AND SOUTH WEST ARROW",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="neswarrow",
   unicodeslot=0x2922,
  },
  [0x2923]={
@@ -65243,6 +65270,8 @@ characters.data={
   description="NORTH WEST ARROW WITH HOOK",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="lhooknwarrow",
   unicodeslot=0x2923,
  },
  [0x2924]={
@@ -65250,6 +65279,8 @@ characters.data={
   description="NORTH EAST ARROW WITH HOOK",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="rhooknearrow",
   unicodeslot=0x2924,
  },
  [0x2925]={
@@ -65257,6 +65288,8 @@ characters.data={
   description="SOUTH EAST ARROW WITH HOOK",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="lhooksearrow",
   unicodeslot=0x2925,
  },
  [0x2926]={
@@ -65264,6 +65297,8 @@ characters.data={
   description="SOUTH WEST ARROW WITH HOOK",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="rhookswarrow",
   unicodeslot=0x2926,
  },
  [0x2927]={
