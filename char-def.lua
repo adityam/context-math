@@ -52111,7 +52111,7 @@ characters.data={
   direction="on",
   linebreak="al",
   mathclass="relation",
-  mathname="dashedleftarrow",
+  mathname="dashleftarrow",
   unicodeslot=0x21E0,
  },
  [0x21E1]={
@@ -52120,7 +52120,7 @@ characters.data={
   direction="on",
   linebreak="al",
   mathclass="relation",
-  mathname="dasheduparrow",
+  mathname="dashuparrow",
   unicodeslot=0x21E1,
  },
  [0x21E2]={
@@ -52129,7 +52129,7 @@ characters.data={
   direction="on",
   linebreak="al",
   mathclass="relation",
-  mathname="dashedrightarrow",
+  mathname="dashrightarrow",
   unicodeslot=0x21E2,
  },
  [0x21E3]={
@@ -52138,7 +52138,7 @@ characters.data={
   direction="on",
   linebreak="al",
   mathclass="relation",
-  mathname="dasheddownarrow",
+  mathname="dashdownarrow",
   unicodeslot=0x21E3,
  },
  [0x21E4]={
