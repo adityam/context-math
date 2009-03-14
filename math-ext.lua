@@ -53,13 +53,13 @@ function mathematics.extras.copy(tfmdata)
                         end
                     end
                 end
-            end
-            if not characters[unicode] then
-                for i=1,#nextinsize do
-                    local nextbase = characters[nextinsize[i]]
-                    if nextbase then
-                        characters[unicode] = nextchar
-                        break
+                if not characters[unicode] then
+                    for i=1,#nextinsize do
+                        local nextbase = characters[nextinsize[i]]
+                        if nextbase then
+                            characters[unicode] = nextchar
+                            break
+                        end
                     end
                 end
             end
@@ -68,6 +68,8 @@ function mathematics.extras.copy(tfmdata)
         -- let's not waste time on non-math
     end
 end
+
+-- 0xFE302 -- 0xFE320 for accents
 
 mathematics.extras.add(0xFE302, {
     category="mn",
@@ -94,7 +96,46 @@ mathematics.extras.add(0xFE303, {
     nextinsize={ 0x00303, 0x0007E },
 } )
 
+-- 0xFE321 -- 0xFE340 for missing characters
+
+-- mathematics.extras.add(0xFE321, {
+--     category="sm",
+--     description="SHORT BAR",
+-- --  direction="on",
+-- --  linebreak="nu",
+--     mathclass="relation",
+--     mathname="mapstochar",
+--     unicodeslot=0xFE321,
+-- } )
+
+
+
+
+
+--~ mathematics.extras.add(0xFE304, {
+--~   category="sm",
+--~   description="TOP AND BOTTOM PARENTHESES",
+--~   direction="on",
+--~   linebreak="al",
+--~   mathclass="doubleaccent",
+--~   mathname="doubleparent",
+--~   unicodeslot=0xFE304,
+--~   accents={ 0x023DC, 0x023DD },
+--~ } )
+
+--~ mathematics.extras.add(0xFE305, {
+--~   category="sm",
+--~   description="TOP AND BOTTOM BRACES",
+--~   direction="on",
+--~   linebreak="al",
+--~   mathclass="doubleaccent",
+--~   mathname="doublebrace",
+--~   unicodeslot=0xFE305,
+--~   accents={ 0x023DE, 0x023DF },
+--~ } )
+
 --~ \Umathchardef\braceld="0 "1 "FF07A
 --~ \Umathchardef\bracerd="0 "1 "FF07B
 --~ \Umathchardef\bracelu="0 "1 "FF07C
 --~ \Umathchardef\braceru="0 "1 "FF07D
+
