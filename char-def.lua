@@ -52729,7 +52729,7 @@ characters.data={
   linebreak="ai",
   mathspec={
    { class="relation", name="parallel" },
-   { class="nothing", name="Vert" },
+   { class="delimiter", name="Vert" },
    { class="nothing", name="Arrowvert" },
    { class="open", name="lVert" },
    { class="close", name="rVert" },
