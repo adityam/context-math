@@ -293,6 +293,9 @@ function fonts.vf.math.define(specification,set)
                                         krn[rk] = kerns[k]
                                     end
                                 end
+                                if not next(krn) then
+                                    krn = nil
+                                end
                                 local t = {
                                     width    = width,
                                     height   = fci.height,
@@ -317,6 +320,7 @@ function fonts.vf.math.define(specification,set)
                                     commands = ref,
                                 }
                             end
+
                         end
                     end
                     if ss.extension then
@@ -437,6 +441,8 @@ function fonts.vf.math.define(specification,set)
     main.type = "virtual" -- not needed
     main.parameters.space = 0 -- else we get problems with missing italic correction due to pending textfont 1 testing
     main.MathConstants = fonts.tfm.scaled_math_parameters(main.math_parameters,1)
+--~ print(0x1D44B,table.serialize(main.characters[0x1D44B]))
+--~ print(0x303,table.serialize(main.characters[0x303]))
     return main
 end
 
