@@ -54444,6 +54444,8 @@ characters.data={
   description="PITCHFORK",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="pitchfork",
   unicodeslot=0x22D4,
  },
  [0x22D5]={
@@ -55047,6 +55049,8 @@ characters.data={
   description="TOP LEFT CORNER",
   direction="on",
   linebreak="al",
+  mathclass="open",
+  mathname="ulcorner",
   unicodeslot=0x231C,
  },
  [0x231D]={
@@ -55054,6 +55058,8 @@ characters.data={
   description="TOP RIGHT CORNER",
   direction="on",
   linebreak="al",
+  mathclass="close",
+  mathname="urcorner",
   unicodeslot=0x231D,
  },
  [0x231E]={
@@ -55061,6 +55067,8 @@ characters.data={
   description="BOTTOM LEFT CORNER",
   direction="on",
   linebreak="al",
+  mathclass="open",
+  mathname="llcorner",
   unicodeslot=0x231E,
  },
  [0x231F]={
@@ -55068,6 +55076,8 @@ characters.data={
   description="BOTTOM RIGHT CORNER",
   direction="on",
   linebreak="al",
+  mathclass="close",
+  mathname="lrcorner",
   unicodeslot=0x231F,
  },
  [0x2320]={
@@ -57809,6 +57819,8 @@ characters.data={
   direction="l",
   lccode=0x24E2,
   linebreak="ai",
+  mathclass="ord",
+  mathname="circledS"
   specials={ "circle", 0x0053 },
   unicodeslot=0x24C8,
  },

@@ -592,12 +592,12 @@ fonts.enc.math["traditional-mr"] = {
 --  [0x0005B] = 0x5B, -- [
 --  [0x0005D] = 0x5D, -- ]
 --  [0x0005E] = 0x5E, -- [math]hat -- the text one
---  [0x00302] = 0x5E, -- [math]hat -- the real math one
+    [0x00302] = 0x5E, -- [math]hat -- the real math one
 --  [0x002D9] = 0x5F, -- [math]dot
     [0x02146] = 0x64,
     [0x02147] = 0x65,
 --  [0x002DC] = 0x7E, -- [math]tilde -- the text one
---  [0x00303] = 0x7E, -- [math]tilde -- the real one
+    [0x00303] = 0x7E, -- [math]tilde -- the real one
 --  [0x000A8] = 0x7F, -- [math]ddot
 }
 
@@ -1043,7 +1043,7 @@ fonts.enc.math["traditional-ma"] = {
     [0x022D4] = 0x74, -- fork                  \pitchfork
     [0x02245] = 0x75, -- dotplus               \dotplus
     [0x0223D] = 0x76, -- revsimilar            \backsim
-    [0x022CD] = 0x77, -- revasymptequal        \backsimeq
+    [0x022CD] = 0x77, -- revasymptequal        \backsimeq -- AM: Check this! I mapped it to simeq.
     [0x0231E] = 0x78, -- rightanglesw          \llcorner
     [0x0231F] = 0x79, -- rightanglese          \lrcorner
     --  [0X0] = 0X7A,    maltesecross
