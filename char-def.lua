@@ -7344,7 +7344,7 @@ characters.data={
   direction="on",
   linebreak="al",
   mathclass="accent",
-  mathname="tilde",
+  -- mathname="tilde",
   specials={ "compat", 0x0020, 0x0303 },
   unicodeslot=0x02DC,
  },
@@ -53138,6 +53138,8 @@ characters.data={
   description="GEOMETRICALLY EQUIVALENT TO",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="Bumpeq",
   unicodeslot=0x224E,
  },
  [0x224F]={
@@ -54354,6 +54356,8 @@ characters.data={
   description="LEFT SEMIDIRECT PRODUCT",
   direction="on",
   linebreak="al",
+  mathclass="binary",
+  mathname="leftthreetimes",
   mirror=0x22CC,
   unicodeslot=0x22CB,
  },
@@ -54363,6 +54367,8 @@ characters.data={
   direction="on",
   linebreak="al",
   mirror=0x22CB,
+  mathclass="binary",
+  mathname="rightthreetimes",
   unicodeslot=0x22CC,
  },
  [0x22CD]={
@@ -54378,6 +54384,8 @@ characters.data={
   description="CURLY LOGICAL OR",
   direction="on",
   linebreak="al",
+  mathclass="binary",
+  mathname="curlyvee",
   unicodeslot=0x22CE,
  },
  [0x22CF]={
@@ -54385,6 +54393,8 @@ characters.data={
   description="CURLY LOGICAL AND",
   direction="on",
   linebreak="al",
+  mathclass="binary",
+  mathname="curlywedge",
   unicodeslot=0x22CF,
  },
  [0x22D0]={
@@ -54412,8 +54422,10 @@ characters.data={
   description="DOUBLE INTERSECTION",
   direction="on",
   linebreak="al",
-  mathclass="binary",
-  mathname="Cap",
+  mathspec={
+    { class="binary", name="Cap" },
+    { class="binary", name="doublecap"},
+  },
   unicodeslot=0x22D2,
  },
  [0x22D3]={
@@ -54421,8 +54433,10 @@ characters.data={
   description="DOUBLE UNION",
   direction="on",
   linebreak="al",
-  mathclass="binary",
-  mathname="Cup",
+  mathspec={
+    { class="binary", name="Cup" },
+    { class="binary", name="doublecup"},
+  },
   unicodeslot=0x22D3,
  },
  [0x22D4]={
@@ -54460,6 +54474,10 @@ characters.data={
   description="VERY MUCH LESS-THAN",
   direction="on",
   linebreak="al",
+  mathspec={
+    { class="relation", name="lll"},
+    { class="relation", name="llless"},
+  },
   mirror=0x22D9,
   unicodeslot=0x22D8,
  },
@@ -54468,6 +54486,10 @@ characters.data={
   description="VERY MUCH GREATER-THAN",
   direction="on",
   linebreak="al",
+  mathspec={
+    { class="relation", name="ggg"},
+    { class="relation", name="gggtr"},
+  },
   mirror=0x22D8,
   unicodeslot=0x22D9,
  },
