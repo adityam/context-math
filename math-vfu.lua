@@ -67,6 +67,21 @@ local function brace(main,unicode,first,rule,left,right,rule,last)
     end
 end
 
+local function arrow(main,unicode,arrow,minus,isleft)
+    if isleft then
+        t = {
+            { extender = 0, glyph = arrow },
+            { extender = 1, glyph = minus  },
+        }
+    else
+        t = {
+            { extender = 0, glyph = minus },
+            { extender = 1, glyph = arrow },
+        }
+    end
+    main.characters[unicode] = { horiz_variants = t }
+end
+
 local function parent(main,unicode,first,rule,last)
     local characters = main.characters
     if not characters[unicode] then
@@ -105,6 +120,17 @@ local function make(main,id,size,n,m)
         characters[dnrule] = { width = rulewidth, height = ht, depth = dp, commands = { push, dn, rule, pop } }
     end
     characters[dnslot] = { width = w, height = ht, depth = dp, commands = { push, dn, slot, pop } }
+end
+
+local function minus(main,id,size,unicode)
+    local characters = main.characters
+    local mu = size/18
+    local minus = characters[0x002D]
+    local width = minus.width - 5*mu
+    characters[unicode] = {
+        width = width, height = minus.height, depth = minus.depth,
+        commands = { push, { "right", -3*mu }, { "slot", id, 0x002D }, pop }
+    }
 end
 
 local function dots(main,id,size,unicode)
@@ -185,6 +211,9 @@ function fonts.vf.math.alas(main,id,size)
     dots(main,id,size,0x22EF) -- cdots
     dots(main,id,size,0x22F1) -- ddots
     dots(main,id,size,0x22F0) -- udots
+    minus(main,id,size,0xFF501)
+    arrow(main,0x2190,0xFE190,0xFF501,true) -- left
+    arrow(main,0x2192,0xFE192,0xFF501,false) -- right
 end
 
 local reverse -- index -> unicode
@@ -785,8 +814,10 @@ fonts.enc.math["traditional-sy"] = {
     [0x0226B] = 0x1D, -- gg
     [0x0227A] = 0x1E, -- prec
     [0x0227B] = 0x1F, -- succ
-    [0x02190] = 0x20, -- leftarrow
-    [0x02192] = 0x21, -- rightarrow
+--~     [0x02190] = 0x20, -- leftarrow
+--~     [0x02192] = 0x21, -- rightarrow
+[0xFE190] = 0x20, -- leftarrow
+[0xFE192] = 0x21, -- rightarrow
     [0x02191] = 0x22, -- uparrow
     [0x02193] = 0x23, -- downarrow
     [0x02194] = 0x24, -- leftrightarrow
