@@ -21,11 +21,6 @@ if not modules then modules = { } end modules ['math-map'] = {
 
 local type, next = type, next
 
-local traverse_id   = node.traverse_id
-local has_attribute = node.has_attribute
-local set_attribute = node.set_attribute
-local glyph         = node.id("glyph")
-
 mathematics = mathematics or { }
 
 -- we could use one level less and have tf etc be tables directly but the
@@ -320,7 +315,7 @@ end
 --~     return data and data.attribute or attribute
 --~ end
 
-local mathalph = attributes.numbers["mathalph"] or 240 -- brr
+local mathalph = attributes.private("mathalph")
 
 local texattribute = tex.attribute
 

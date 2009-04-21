@@ -69,6 +69,8 @@ function mathematics.extras.copy(tfmdata)
     end
 end
 
+table.insert(fonts.tfm.mathactions,mathematics.extras.copy)
+
 -- 0xFE302 -- 0xFE320 for accents
 
 mathematics.extras.add(0xFE302, {

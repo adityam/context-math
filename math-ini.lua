@@ -9,6 +9,8 @@ if not modules then modules = { } end modules ['math-ext'] = {
 -- if needed we can use the info here to set up xetex definition files
 -- the "8000 hackery influences direct characters (utf) as indirect \char's
 
+local utf = unicode.utf8
+
 local texsprint, format, utfchar, utfbyte = tex.sprint, string.format, utf.char, utf.byte
 
 local trace_defining = false  trackers.register("math.defining", function(v) trace_defining = v end)
@@ -188,35 +190,17 @@ function mathematics.define(slots,family)
                 end
             end
         end
-        local class = character.mathclass
-        if class then
-            class = classes[class] or class -- no real checks needed
-            local name = character.mathname
-            if name == false then
-                if trace_defining then
-                    report(class,family,unicode,name)
-                end
-                setmathcharacter(class,family,unicode)
-            else
-                name = name or character.contextname
-                if name then
-                    if trace_defining then
-                        report(class,family,unicode,name)
-                    end
-                    setmathsymbol(name,class,family,unicode)
-                else
-                    if trace_defining then
-                        report(class,family,unicode,character.adobename)
-                    end
-                end
-                setmathcharacter(class,family,unicode,unicode)
-            end
-        end
-        local spec = character.mathspec
-        if spec then
-            for i, m in next, spec do
+        local mathclass = character.mathclass
+        local mathspec = character.mathspec
+        if mathspec then
+            for i, m in next, mathspec do
                 local name = m.name
                 local class = m.class
+                if not class then
+                    class = mathclass
+                elseif not mathclass then
+                    mathclass = class
+                end
                 if class then
                     class = classes[class] or class -- no real checks needed
                     if name then
@@ -236,6 +220,29 @@ function mathematics.define(slots,family)
                     end
                     setmathcharacter(class,family,unicode,unicode,i)
                 end
+            end
+        end
+        if mathclass then
+            local name = character.mathname
+            local class = classes[mathclass] or mathclass -- no real checks needed
+            if name == false then
+                if trace_defining then
+                    report(class,family,unicode,name)
+                end
+                setmathcharacter(class,family,unicode)
+            else
+                name = name or character.contextname
+                if name then
+                    if trace_defining then
+                        report(class,family,unicode,name)
+                    end
+                    setmathsymbol(name,class,family,unicode)
+                else
+                    if trace_defining then
+                        report(class,family,unicode,character.adobename)
+                    end
+                end
+                setmathcharacter(class,family,unicode,unicode)
             end
         end
     end
@@ -291,3 +298,23 @@ function mathematics.big(tfmdata,unicode,n)
     end
     return unicode
 end
+
+-- plugins
+
+function mathematics.scaleparameters(t,tfmtable,delta)
+    local math_parameters = tfmtable.math_parameters
+    if math_parameters and next(math_parameters) then
+        delta = delta or 1
+        local _, mp = mathematics.dimensions(math_parameters)
+        for name, value in next, mp do
+            if name ~= "RadicalDegreeBottomRaisePercent" then
+                mp[name] = delta*value
+            else
+                mp[name] = value
+            end
+        end
+        t.MathConstants = mp
+    end
+end
+
+table.insert(fonts.tfm.mathactions,mathematics.scaleparameters)

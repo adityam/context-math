@@ -10,11 +10,13 @@ if not modules then modules = { } end modules ['math-noa'] = {
 -- generic (attribute value driven) interface too but for the
 -- moment this is ok
 
+local utf = unicode.utf8
+
 local set_attribute  = node.set_attribute
 local has_attribute  = node.has_attribute
 local mlist_to_hlist = node.mlist_to_hlist
 local font_of_family = node.family_font
-local fontdata       = fonts.tfm.id
+local fontdata       = fonts.ids
 
 local format, rep  = string.format, string.rep
 local utfchar, utfbyte = utf.char, utf.byte
@@ -25,19 +27,37 @@ local trace_remapping  = false  trackers.register("math.remapping",  function(v)
 local trace_processing = false  trackers.register("math.processing", function(v) trace_processing = v end)
 local trace_analyzing  = false  trackers.register("math.analyzing",  function(v) trace_analyzing  = v end)
 
-local math_ord       = node.id("ord")            -- attr nucleus sub sup
-local math_op        = node.id("op")             -- attr nucleus sub sup subtype
-local math_bin       = node.id("bin")            -- attr nucleus sub sup
-local math_rel       = node.id("rel")            -- attr nucleus sub sup
-local math_punct     = node.id("punct")          -- attr nucleus sub sup
+local noad_ord               =  0
+local noad_op_displaylimits  =  1
+local noad_op_limits         =  2
+local noad_op_nolimits       =  3
+local noad_bin               =  4
+local noad_rel               =  5
+local noad_open              =  6
+local noad_close             =  7
+local noad_punct             =  8
+local noad_inner             =  9
+local noad_under             = 10
+local noad_over              = 11
+local noad_vcenter           = 12
 
-local math_open      = node.id("open")           -- attr nucleus sub sup
-local math_close     = node.id("close")          -- attr nucleus sub sup
+-- obsolete:
+--
+--    math_ord       = node.id("ord")            -- attr nucleus sub sup
+--    math_op        = node.id("op")             -- attr nucleus sub sup subtype
+--    math_bin       = node.id("bin")            -- attr nucleus sub sup
+--    math_rel       = node.id("rel")            -- attr nucleus sub sup
+--    math_punct     = node.id("punct")          -- attr nucleus sub sup
+--
+--    math_open      = node.id("open")           -- attr nucleus sub sup
+--    math_close     = node.id("close")          -- attr nucleus sub sup
+--
+--    math_inner     = node.id("inner")          -- attr nucleus sub sup
+--    math_vcenter   = node.id("vcenter")        -- attr nucleus sub sup
+--    math_under     = node.id("under")          -- attr nucleus sub sup
+--    math_over      = node.id("over")           -- attr nucleus sub sup
 
-local math_inner     = node.id("inner")          -- attr nucleus sub sup
-local math_vcenter   = node.id("vcenter")        -- attr nucleus sub sup
-local math_under     = node.id("under")          -- attr nucleus sub sup
-local math_over      = node.id("over")           -- attr nucleus sub sup
+local math_noad      = node.id("noad")           -- attr nucleus sub sup
 
 local math_accent    = node.id("accent")         -- attr nucleus sub sup accent
 local math_radical   = node.id("radical")        -- attr nucleus sub sup left degree
@@ -53,13 +73,11 @@ local math_choice    = node.id("choice")         -- attr display text script scr
 local math_fence     = node.id("fence")          -- attr subtype
 
 local simple_noads = table.tohash {
-    math_ord, math_op, math_bin, math_rel, math_punct,
-    math_open, math_close,
-    math_inner, math_vcenter, math_under, math_over,
+    math_noad,
 }
 
 local all_noads = {
-    math_ord, math_op, math_bin, math_rel, math_open, math_close, math_punct, math_inner, math_vcenter, math_under, math_over,
+    math_noad,
     math_box, math_sub,
     math_char, math_text_char, math_delim, math_style,
     math_accent, math_radical, math_fraction, math_choice, math_fence,
@@ -81,7 +99,7 @@ local function process(start,what,n)
             break
         elseif id == math_style then
             -- has a next
-        elseif simple_noads[id] then
+        elseif id == math_noad then
             local noad = start.nucleus      if noad then process(noad,what,n) end -- list
                   noad = start.sup          if noad then process(noad,what,n) end -- list
                   noad = start.sub          if noad then process(noad,what,n) end -- list
@@ -122,12 +140,12 @@ noads.process = process
 
 -- character remapping
 
-local attribute = attributes.numbers["mathalph"] or 240 -- brr
+local attribute = attributes.private("mathalph")
 
 noads.processors.relocate = { }
 
-local function report_remap(tag,old,new,extra)
-    logs.report("math","remapping %s from U+%04X (%s) to U+%04X (%s)%s",tag,old,utfchar(old),new,utfchar(new),extra or "")
+local function report_remap(tag,id,old,new,extra)
+    logs.report("math","remapping %s in font %s from U+%04X (%s) to U+%04X (%s)%s",tag,id,old,utfchar(old),new,utfchar(new),extra or "")
 end
 
 local remap_alphabets = mathematics.remap_alphabets
@@ -145,7 +163,7 @@ noads.processors.relocate[math_char] = function(pointer)
             local tfmdata = fontdata[id]
             if tfmdata and tfmdata.characters[newchar] then -- we could probably speed this up
                 if trace_remapping then
-                    report_remap("char",char,newchar)
+                    report_remap("char",id,char,newchar)
                 end
                 if trace_analyzing then
                     fcs(pointer,"font:isol")
@@ -153,7 +171,7 @@ noads.processors.relocate[math_char] = function(pointer)
                 pointer.char = newchar
                 return
             elseif trace_remapping then
-                report_remap("char",char,newchar," fails")
+                report_remap("char",id,char,newchar," fails")
             end
         end
     end
@@ -183,13 +201,13 @@ end
 -- empty and no larger next will be forced)
 --
 -- beware: we don't use \delcode but \Udelcode and as such have
--- no large_fam; also, we needt to check for subtype and/or
+-- no large_fam; also, we need to check for subtype and/or
 -- small_fam not being 0 because \. sits in 0,0 by default
 --
 -- todo: just replace the character by an ord noad
 -- and remove the right delimiter as well
 
-local attribute = attributes.numbers["mathsize"] or 241
+local attribute = attributes.private("mathsize")
 
 noads.processors.resize = { }
 
@@ -216,67 +234,46 @@ end
 
 -- respacing
 
-local attribute = attributes.numbers["mathpunc"] or 242
+local attribute = attributes.private("mathpunc")
 
 noads.processors.respace = { }
-
--- noads.processors.respace[math_punct] = function(pointer)
---     -- attr nucleus sub sup
---     -- attr fam char
---     local a = has_attribute(pointer,attribute)
---     if a and a > 0 then
---         set_attribute(pointer,attribute,0)
---         local pn = pointer.nucleus
---         if pn and pn.id == math_char then
---             local cc = pn.char
---             if cc == comma or cc == period then
---                 local p = pointer.prev
---                 if p and p.id == math_ord and p.nucleus and p.nucleus.id == math.char  then
---                     local n = pointer.next
---                     if n and n.id == math_ord and n.nucleus and n.nucleus.id == math.char then
---                         local pc = p.nucleus.char
---                         local nc = n.nucleus.char
---                         print("!!!!!!!!!!!!!!!!!!",pc,cc,nc)
---                     end
---                 end
---             end
---         end
---     end
--- end
 
 local chardata = characters.data
 
 -- only [nd,ll,ul][po][nd,ll,ul]
 
-noads.processors.respace[math_ord] = function(pointer)
-    local a = has_attribute(pointer,attribute)
-    if a and a > 0 then
-        set_attribute(pointer,attribute,0)
-        local current_nucleus = pointer.nucleus
-        if current_nucleus.id == math_char then
-            local current_char = current_nucleus.char
-            local fc = chardata[current_char]
-            if fc == "nd" or fc == "ll" or fc == "lu" then
-                local next_noad = pointer.next
-                if next_noad and next_noad.id == math_punct then
-                    local next_nucleus = next_noad.nucleus
-                    if next_nucleus.id == math_char then
-                        local next_char = next_nucleus.char
-                        if chardata[next_char].category == "po" then
-                            local last_noad = next_noad.next
-                            if last_noad then
-                                local last_nucleus = last_noad.nucleus
-                                if last_nucleus.id == math_char then
-                                    local last_char = last_nucleus.char
-                                    local lc = chardata[first_char]
-                                    if lc == "nd" or lc == "ll" or lc == "lu" then
-                                        local ord = node.new(math_ord)
-                                        ord.nucleus, ord.sub, ord.sup, ord.attr = next_noad.nucleus, next_noad.sub, next_noad.sup, next_noad.attr
-                                    --  next_noad.nucleus, next_noad.sub, next_noad.sup, next_noad.attr = nil, nil, nil, nil
-                                        next_noad.nucleus, next_noad.sub, next_noad.sup = nil, nil, nil -- else crash with attributes ref count
-                                        ord.next = last_noad
-                                        pointer.next = ord
-                                        node.free(next_noad)
+noads.processors.respace[math_noad] = function(pointer)
+    if pointer.subtype == noad_ord then
+        local a = has_attribute(pointer,attribute)
+        if a and a > 0 then
+            set_attribute(pointer,attribute,0)
+            local current_nucleus = pointer.nucleus
+            if current_nucleus.id == math_char then
+                local current_char = current_nucleus.char
+                local fc = chardata[current_char]
+                if fc == "nd" or fc == "ll" or fc == "lu" then
+                    local next_noad = pointer.next
+                    if next_noad and next_noad.id == math_noad and next_noad.subtype == noad_punct then
+                        local next_nucleus = next_noad.nucleus
+                        if next_nucleus.id == math_char then
+                            local next_char = next_nucleus.char
+                            if chardata[next_char].category == "po" then
+                                local last_noad = next_noad.next
+                                if last_noad then
+                                    local last_nucleus = last_noad.nucleus
+                                    if last_nucleus.id == math_char then
+                                        local last_char = last_nucleus.char
+                                        local lc = chardata[first_char]
+                                        if lc == "nd" or lc == "ll" or lc == "lu" then
+                                            local ord = node.new(math_noad) -- todo: pool
+                                            ord.subtype, ord.nucleus, ord.sub, ord.sup, ord.attr = noad_ord, next_noad.nucleus, next_noad.sub, next_noad.sup, next_noad.attr
+                                        --  next_noad.nucleus, next_noad.sub, next_noad.sup, next_noad.attr = nil, nil, nil, nil
+                                            next_noad.nucleus, next_noad.sub, next_noad.sup = nil, nil, nil -- else crash with attributes ref count
+--~ next_noad.attr = nil
+                                            ord.next = last_noad
+                                            pointer.next = ord
+                                            node.free(next_noad)
+                                        end
                                     end
                                 end
                             end
@@ -300,7 +297,7 @@ function noads.mlist_to_hlist(head,tail,style,penalties)
     return mlist_to_hlist(head,style,penalties), true
 end
 
-nodes.tasks.new (
+tasks.new (
     "math",
     {
         "normalizers",
@@ -308,12 +305,12 @@ nodes.tasks.new (
     }
 )
 
---~ nodes.tasks.appendaction("math", "normalizers", "noads.relocate_characters", nil, "nohead")
---~ nodes.tasks.appendaction("math", "normalizers", "noads.resize_characters",   nil, "nohead")
---~ nodes.tasks.appendaction("math", "normalizers", "noads.respace_characters",  nil, "nohead")
---~ nodes.tasks.appendaction("math", "builders",    "noads.mlist_to_hlist",      nil, "notail")
+--~ tasks.appendaction("math", "normalizers", "noads.relocate_characters", nil, "nohead")
+--~ tasks.appendaction("math", "normalizers", "noads.resize_characters",   nil, "nohead")
+--~ tasks.appendaction("math", "normalizers", "noads.respace_characters",  nil, "nohead")
+--~ tasks.appendaction("math", "builders",    "noads.mlist_to_hlist",      nil, "notail")
 
-local actions = nodes.tasks.actions("math")
+local actions = tasks.actions("math")
 
 local starttiming, stoptiming = statistics.starttiming, statistics.stoptiming
 
