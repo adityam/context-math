@@ -90,7 +90,8 @@ local defaults = {
         ['default']={ "RadicalRuleThickness", "<not set>" },
      },
     ['radical_vgap']={
-        ['default']={ "RadicalDisplayStyleVerticalGap", "default_rule_thickness+(abs(default_rule_thickness)/4)" },
+        ['default']={ "RadicalVerticalGap", "default_rule_thickness+(abs(default_rule_thickness)/4)" },
+        ['display_style']={ "RadicalDisplayStyleVerticalGap", "default_rule_thickness+(abs(math_x_height)/4)" },
      },
     ['space_after_script']={
         ['default']={ "SpaceAfterScript", "script_space" },
@@ -211,6 +212,7 @@ function mathematics.dimensions(dimens)
         dimens["4*default_rule_thickness"] = 4*default_rule_thickness
         dimens["7*default_rule_thickness"] = 7*default_rule_thickness
         dimens["abs(math_x_height*4)/5"] = abs(math_x_height * 4) / 5
+        dimens["default_rule_thickness+(abs(default_rule_thickness)/4)"] = default_rule_thickness+(abs(default_rule_thickness)/4)
         dimens["default_rule_thickness+(abs(math_x_height)/4)"] = default_rule_thickness+(abs(math_x_height)/4)
         dimens["abs(math_x_height)/4"] = abs(math_x_height)/4
         dimens["abs(math_x_height*4)/5"] = abs(math_x_height*4)/5
