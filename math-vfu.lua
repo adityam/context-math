@@ -379,7 +379,6 @@ function fonts.vf.math.define(specification,set)
                                     commands = ref,
                                 }
                             end
-
                         end
                     end
                     if ss.extension then
@@ -544,9 +543,10 @@ fonts.enc.math["large-to-small"] = {
     [0x021D1] = 0x7E, -- Uparrow
     [0x021D3] = 0x7F, -- Downarrow
     [0x0220F] = 0x59, -- prod
-    [0x0222B] = 0x5A, -- intop
     [0x02210] = 0x61, -- coprod
     [0x02211] = 0x58, -- sum
+    [0x0222B] = 0x5A, -- intop
+    [0x0222E] = 0x49, -- ointop
     [0xFE302] = 0x62, -- widehat
     [0xFE303] = 0x65, -- widetilde
     [0x022C0] = 0x5E, -- bigwedge
