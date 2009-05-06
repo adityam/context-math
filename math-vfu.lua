@@ -335,7 +335,9 @@ function fonts.vf.math.define(specification,set)
                     for unicode, index in next, vector do
                         local fci = fc[index]
                         if not fci then
-                            logs.report("math virtual", "unicode point U+%04X has no index %04X in %s",unicode,index,vectorname)
+                        -- if trace_virtual then
+                                logs.report("math virtual", "unicode point U+%04X has no index %04X in %s",unicode,index,vectorname)
+                        --  end
                         else
                             local ref = si[index]
                             if not ref then
@@ -1465,69 +1467,69 @@ mathematics.make_font ( "lmroman17-math", {
 -- pxr/txr messes up the accents
 
 mathematics.make_font ( "px-math", {
-    { name = "texgyrepagella-regular", features = "virtualmath", main = true },
-    { name = "pxr", vector = "traditional-mr" } ,
-    { name = "pxmi", vector = "traditional-mi", skewchar=0x7F },
-    { name = "pxsy", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
-    { name = "pxex", vector = "traditional-ex", extension = true } ,
-    { name = "pxsya", vector = "traditional-ma" },
-    { name = "pxsyb", vector = "traditional-mb" },
+    { name = "texgyrepagella-regular.otf", features = "virtualmath", main = true },
+    { name = "pxr.tfm", vector = "traditional-mr" } ,
+    { name = "pxmi.tfm", vector = "traditional-mi", skewchar=0x7F },
+    { name = "pxsy.tfm", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
+    { name = "pxex.tfm", vector = "traditional-ex", extension = true } ,
+    { name = "pxsya.tfm", vector = "traditional-ma" },
+    { name = "pxsyb.tfm", vector = "traditional-mb" },
 } )
 
 mathematics.make_font ( "tx-math", {
-    { name = "texgyretermes-regular", features = "virtualmath", main = true },
-    { name = "txr", vector = "traditional-mr" } ,
-    { name = "txmi", vector = "traditional-mi", skewchar=0x7F },
-    { name = "txsy", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
-    { name = "txex", vector = "traditional-ex", extension = true } ,
-    { name = "txsya", vector = "traditional-ma" },
-    { name = "txsyb", vector = "traditional-mb" },
+    { name = "texgyretermes-regular.otf", features = "virtualmath", main = true },
+    { name = "txr.tfm", vector = "traditional-mr" } ,
+    { name = "txmi.tfm", vector = "traditional-mi", skewchar=0x7F },
+    { name = "txsy.tfm", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
+    { name = "txex.tfm", vector = "traditional-ex", extension = true } ,
+    { name = "txsya.tfm", vector = "traditional-ma" },
+    { name = "txsyb.tfm", vector = "traditional-mb" },
 } )
 
 mathematics.make_font ( "iwona-math", {
     { name = "file:Iwona-Regular", features = "virtualmath", main = true },
-    { name = "mi-iwonari", vector = "traditional-mi", skewchar=0x7F },
-    { name = "sy-iwonarz", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
-    { name = "ex-iwonar", vector = "traditional-ex", extension = true } ,
-    { name = "msam10", vector = "traditional-ma" },
-    { name = "msbm10", vector = "traditional-mb" },
+    { name = "mi-iwonari.tfm", vector = "traditional-mi", skewchar=0x7F },
+    { name = "sy-iwonarz.tfm", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
+    { name = "ex-iwonar.tfm", vector = "traditional-ex", extension = true } ,
+    { name = "msam10.tfm", vector = "traditional-ma" },
+    { name = "msbm10.tfm", vector = "traditional-mb" },
 } )
 
 mathematics.make_font ( "iwona-light-math", {
     { name = "file:IwonaLight-Regular", features = "virtualmath", main = true },
-    { name = "mi-iwonali", vector = "traditional-mi", skewchar=0x7F },
-    { name = "sy-iwonalz", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
-    { name = "ex-iwonal", vector = "traditional-ex", extension = true } ,
-    { name = "msam10", vector = "traditional-ma" },
-    { name = "msbm10", vector = "traditional-mb" },
+    { name = "mi-iwonali.tfm", vector = "traditional-mi", skewchar=0x7F },
+    { name = "sy-iwonalz.tfm", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
+    { name = "ex-iwonal.tfm", vector = "traditional-ex", extension = true } ,
+    { name = "msam10.tfm", vector = "traditional-ma" },
+    { name = "msbm10.tfm", vector = "traditional-mb" },
 } )
 
 mathematics.make_font ( "iwona-medium-math", {
     { name = "file:IwonaMedium-Regular", features = "virtualmath", main = true },
-    { name = "mi-iwonami", vector = "traditional-mi", skewchar=0x7F },
-    { name = "sy-iwonamz", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
-    { name = "ex-iwonam", vector = "traditional-ex", extension = true } ,
-    { name = "msam10", vector = "traditional-ma" },
-    { name = "msbm10", vector = "traditional-mb" },
+    { name = "mi-iwonami.tfm", vector = "traditional-mi", skewchar=0x7F },
+    { name = "sy-iwonamz.tfm", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
+    { name = "ex-iwonam.tfm", vector = "traditional-ex", extension = true } ,
+    { name = "msam10.tfm", vector = "traditional-ma" },
+    { name = "msbm10.tfm", vector = "traditional-mb" },
 } )
 
 mathematics.make_font ( "iwona-heavy-math", {
     { name = "file:IwonaHeavy-Regular", features = "virtualmath", main = true },
-    { name = "mi-iwonahi", vector = "traditional-mi", skewchar=0x7F },
-    { name = "sy-iwonahz", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
-    { name = "ex-iwonah", vector = "traditional-ex", extension = true } ,
-    { name = "msam10", vector = "traditional-ma" },
-    { name = "msbm10", vector = "traditional-mb" },
+    { name = "mi-iwonahi.tfm", vector = "traditional-mi", skewchar=0x7F },
+    { name = "sy-iwonahz.tfm", vector = "traditional-sy", skewchar=0x30, parameters = true } ,
+    { name = "ex-iwonah.tfm", vector = "traditional-ex", extension = true } ,
+    { name = "msam10.tfm", vector = "traditional-ma" },
+    { name = "msbm10.tfm", vector = "traditional-mb" },
 } )
 
 -- not ok, we need adapted vectors !
 
 mathematics.make_font ( "mathtimes-math", {
-    { name = "file:texgyretermes-regular", features = "virtualmath", main = true },
-    { name = "mtmiz", vector = "traditional-mi", skewchar=0x7F },
-    { name = "mtsyn", vector = "traditional-sy", skewchar=0x30, parameters = true },
-    { name = "mtex", vector = "traditional-ex", extension = true },
-    { name = "msam10", vector = "traditional-ma" },
-    { name = "msbm10", vector = "traditional-mb" },
+    { name = "file:texgyretermes-regular.otf", features = "virtualmath", main = true },
+    { name = "mtmiz.tfm", vector = "traditional-mi", skewchar=0x7F },
+    { name = "mtsyn.tfm", vector = "traditional-sy", skewchar=0x30, parameters = true },
+    { name = "mtex.tfm", vector = "traditional-ex", extension = true },
+    { name = "msam10.tfm", vector = "traditional-ma" },
+    { name = "msbm10.tfm", vector = "traditional-mb" },
 } )
 

@@ -251,19 +251,23 @@ noads.processors.respace[math_noad] = function(pointer)
             if current_nucleus.id == math_char then
                 local current_char = current_nucleus.char
                 local fc = chardata[current_char]
+                fc = fc and fc.category
                 if fc == "nd" or fc == "ll" or fc == "lu" then
                     local next_noad = pointer.next
                     if next_noad and next_noad.id == math_noad and next_noad.subtype == noad_punct then
                         local next_nucleus = next_noad.nucleus
                         if next_nucleus.id == math_char then
                             local next_char = next_nucleus.char
-                            if chardata[next_char].category == "po" then
+                            local nc = chardata[next_char]
+                            nc = nc and nc.category
+                            if nc == "po" then
                                 local last_noad = next_noad.next
                                 if last_noad then
                                     local last_nucleus = last_noad.nucleus
                                     if last_nucleus.id == math_char then
                                         local last_char = last_nucleus.char
-                                        local lc = chardata[first_char]
+                                        local lc = chardata[last_char]
+                                        lc = lc and lc.category
                                         if lc == "nd" or lc == "ll" or lc == "lu" then
                                             local ord = node.new(math_noad) -- todo: pool
                                             ord.subtype, ord.nucleus, ord.sub, ord.sup, ord.attr = noad_ord, next_noad.nucleus, next_noad.sub, next_noad.sup, next_noad.attr

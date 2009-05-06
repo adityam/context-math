@@ -166,7 +166,7 @@
     #2{\mkern-\muskip\zerocount{#3}\mkern\muskip\zerocount}\mkern-\muskip\zerocount}{}}
 
 \def\n@space
-  {\nulldelimiterspace\zerocount \mathsurround\zeropoint}
+  {\nulldelimiterspace\zerocount \relax \mathsurround\zeropoint}
 
 \def\choose{\atopwithdelims()}
 \def\brack {\atopwithdelims[]}
@@ -179,14 +179,14 @@
      {#1\scriptstyle      {#2}}%
      {#1\scriptscriptstyle{#2}}}
 
-\def\cong%
+\def\cong
   {\mathrel{\mathpalette\@vereq\sim}} % congruence sign
 
 \def\@vereq#1#2%
   {\lower.5\points\vbox{\lineskiplimit\maxdimen\lineskip-.5\points
    \ialign{$\mathsurround\zeropoint#1\hfil##\hfil$\crcr#2\crcr=\crcr}}}
 
-\def\notin%
+\def\notin% can be mkiv'd
   {\mathrel{\mathpalette\c@ncel\in}}
 
 \def\c@ncel#1#2%
