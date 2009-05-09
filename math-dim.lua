@@ -169,6 +169,15 @@ local defaults = {
     ['under_delimiter_bgap']={
         ['default']={ "StretchStackBottomShiftDown", "big_op_spacing4" },
     },
+    ['radical_degree_before']={
+        ['default']={ "RadicalKernBeforeDegree", "(5/18)*quad" },
+    },
+    ['radical_degree_after']={
+        ['default']={ "RadicalKernAfterDegree", "(-10/18)*quad" },
+    },
+    ['radical_degree_raise']={
+        ['default']={ "RadicalDegreeBottomRaisePercent", "60" },
+    },
 }
 
 local styles = {
@@ -205,17 +214,21 @@ function mathematics.dimensions(dimens)
     elseif dimens.AxisHeight or dimens.axis_height then
         local t = { }
         local math_x_height = dimens.x_height or 10*65526
+        local math_quad = dimens.quad or 10*65526
         local default_rule_thickness = dimens.FractionDenominatorGapMin or dimens.default_rule_thickness or 0.4*65526
         dimens["0"] = 0
-        dimens["0.25*default_rule_thickness"] = default_rule_thickness/4
-        dimens["3*default_rule_thickness"] = 3*default_rule_thickness
-        dimens["4*default_rule_thickness"] = 4*default_rule_thickness
-        dimens["7*default_rule_thickness"] = 7*default_rule_thickness
+        dimens["60"] = 60
+        dimens["0.25*default_rule_thickness"] = default_rule_thickness / 4
+        dimens["3*default_rule_thickness"] = 3 * default_rule_thickness
+        dimens["4*default_rule_thickness"] = 4 * default_rule_thickness
+        dimens["7*default_rule_thickness"] = 7 * default_rule_thickness
+        dimens["(5/18)*quad"] = (math_quad * 5) / 18
+        dimens["(-10/18)*quad"] = - (math_quad * 10) / 18
         dimens["abs(math_x_height*4)/5"] = abs(math_x_height * 4) / 5
-        dimens["default_rule_thickness+(abs(default_rule_thickness)/4)"] = default_rule_thickness+(abs(default_rule_thickness)/4)
-        dimens["default_rule_thickness+(abs(math_x_height)/4)"] = default_rule_thickness+(abs(math_x_height)/4)
-        dimens["abs(math_x_height)/4"] = abs(math_x_height)/4
-        dimens["abs(math_x_height*4)/5"] = abs(math_x_height*4)/5
+        dimens["default_rule_thickness+(abs(default_rule_thickness)/4)"] = default_rule_thickness+(abs(default_rule_thickness) / 4)
+        dimens["default_rule_thickness+(abs(math_x_height)/4)"] = default_rule_thickness+(abs(math_x_height) / 4)
+        dimens["abs(math_x_height)/4"] = abs(math_x_height) / 4
+        dimens["abs(math_x_height*4)/5"] = abs(math_x_height * 4) / 5
         dimens["<not set>"] = false
         dimens["script_space"] = false -- at macro level
         for variable, styles in next, defaults do
@@ -257,6 +270,9 @@ function mathematics.dimensions(dimens)
             RadicalExtraAscender                        = t . radical_kern          . text_style,
             RadicalRuleThickness                        = t . radical_rule          . text_style,
             RadicalVerticalGap                          = t . radical_vgap          . text_style,
+            RadicalKernBeforeDegree                     = t . radical_degree_before . display_style,
+            RadicalKernAfterDegree                      = t . radical_degree_after  . display_style,
+            RadicalDegreeBottomRaisePercent             = t . radical_degree_raise  . display_style,
             SpaceAfterScript                            = t . space_after_script    . text_style,
             StackBottomDisplayStyleShiftDown            = t . stack_denom_down      . display_style,
             StackBottomShiftDown                        = t . stack_denom_down      . text_style,
@@ -285,7 +301,7 @@ function mathematics.dimensions(dimens)
             StretchStackBottomShiftDown                 = t . under_delimiter_bgap  . text_style,
         }
         d.AccentBaseHeight = 0
---~ texio.write_nl(table.serialize(d))
+        -- texio.write_nl(table.serialize(d))
         return t, d -- this might change
     else
         return { }, { }
