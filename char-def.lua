@@ -83759,18 +83759,11 @@ characters.data={
  [0x3400]={
   category="lo",
   cjkwd="w",
-  description="<CJK Ideograph Extension A, First>",
+  description="<CJK Ideograph Extension A>",
   direction="l",
   linebreak="id",
   unicodeslot=0x3400,
- },
- [0x4DB5]={
-  category="lo",
-  cjkwd="w",
-  description="<CJK Ideograph Extension A, Last>",
-  direction="l",
-  linebreak="id",
-  unicodeslot=0x4DB5,
+  range= 0x4DB5,
  },
  [0x4DC0]={
   category="so",
@@ -84223,17 +84216,11 @@ characters.data={
  [0x4E00]={
   category="lo",
   cjkwd="w",
-  description="<CJK Ideograph, First>",
+  description="<CJK Ideograph>",
   direction="l",
   linebreak="id",
   unicodeslot=0x4E00,
- },
- [0x9FBB]={
-  category="lo",
-  cjkwd="w",
-  description="<CJK Ideograph, Last>",
-  linebreak="id",
-  unicodeslot=0x9FBB,
+  range=0x9FBB,
  },
  [0xA000]={
   category="lo",
@@ -94901,18 +94888,11 @@ characters.data={
  [0xAC00]={
   category="lo",
   cjkwd="w",
-  description="<Hangul Syllable, First>",
+  description="<Hangul Syllable>",
   direction="l",
   linebreak="h2",
   unicodeslot=0xAC00,
- },
- [0xD7A3]={
-  category="lo",
-  cjkwd="w",
-  description="<Hangul Syllable, Last>",
-  direction="l",
-  linebreak="h3",
-  unicodeslot=0xD7A3,
+  range=0xD7A3,
  },
  [0xD800]={
   category="cs",
@@ -133611,18 +133591,11 @@ characters.data={
  [0x20000]={
   category="lo",
   cjkwd="w",
-  description="<CJK Ideograph Extension B, First>",
+  description="<CJK Ideograph Extension B>",
   direction="l",
   linebreak="id",
   unicodeslot=0x20000,
- },
- [0x2A6D6]={
-  category="lo",
-  cjkwd="w",
-  description="<CJK Ideograph Extension B, Last>",
-  direction="l",
-  linebreak="id",
-  unicodeslot=0x2A6D6,
+  range=0x2A6D6,
  },
  [0x2F800]={
   category="lo",
