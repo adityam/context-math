@@ -97,12 +97,12 @@
 \definemathcommand [tanh]    [nolop] {\mfunction{tanh}}
 \definemathcommand [tan]     [nolop] {\mfunction{tan}}
 
-\definemathcommand [integers]        {\mathblackboard{Z}}
-\definemathcommand [reals]           {\mathblackboard{R}}
-\definemathcommand [rationals]       {\mathblackboard{Q}}
-\definemathcommand [naturalnumbers]  {\mathblackboard{N}}
-\definemathcommand [complexes]       {\mathblackboard{C}}
-\definemathcommand [primes]          {\mathblackboard{P}}
+\definemathcommand [integers]      {{\mathblackboard Z}}
+\definemathcommand [reals]         {{\mathblackboard R}}
+\definemathcommand [rationals]     {{\mathblackboard Q}}
+\definemathcommand [naturalnumbers]{{\mathblackboard N}}
+\definemathcommand [complexes]     {{\mathblackboard C}}
+\definemathcommand [primes]        {{\mathblackboard P}}
 
 % using attributes
 
@@ -143,6 +143,13 @@
 \setoperatorlimits\intclockwise     \intlimits
 \setoperatorlimits\ointclockwise    \intlimits
 \setoperatorlimits\ointctrclockwise \intlimits
+
+%D This is a temporary hack until we figure out how to do this correctly.
+
+\unexpanded\def\implies  {\mathrel{\;\Longrightarrow\;}}
+\unexpanded\def\impliedby{\mathrel{\;\Longleftarrow\;}}
+\unexpanded\def\And      {\mathrel{\;\internalAnd\;}}
+\unexpanded\def\iff      {\;\Longleftrightarrow\;}
 
 % todo: virtual in math-vfu
 

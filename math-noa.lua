@@ -262,7 +262,7 @@ noads.processors.respace[math_noad] = function(pointer)
                             nc = nc and nc.category
                             if nc == "po" then
                                 local last_noad = next_noad.next
-                                if last_noad then
+                                if last_noad and last_noad.id == math_noad and last_noad.subtype == noad_ord then
                                     local last_nucleus = last_noad.nucleus
                                     if last_nucleus.id == math_char then
                                         local last_char = last_nucleus.char
@@ -273,7 +273,7 @@ noads.processors.respace[math_noad] = function(pointer)
                                             ord.subtype, ord.nucleus, ord.sub, ord.sup, ord.attr = noad_ord, next_noad.nucleus, next_noad.sub, next_noad.sup, next_noad.attr
                                         --  next_noad.nucleus, next_noad.sub, next_noad.sup, next_noad.attr = nil, nil, nil, nil
                                             next_noad.nucleus, next_noad.sub, next_noad.sup = nil, nil, nil -- else crash with attributes ref count
---~ next_noad.attr = nil
+                                        --~ next_noad.attr = nil
                                             ord.next = last_noad
                                             pointer.next = ord
                                             node.free(next_noad)

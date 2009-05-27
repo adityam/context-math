@@ -57,6 +57,7 @@
 \def\setmathstyle      #1{\ctxlua{mathematics.sync_a_style("#1")}}
 
 \unexpanded\def\mr            {\setmathattribute{regular}{tf}}
+
 \unexpanded\def\mathdefault   {\setmathattribute{regular}{it}}
 \unexpanded\def\mathscript    {\setmathalphabet{script}}
 \unexpanded\def\mathfraktur   {\setmathalphabet{fraktur}}
@@ -82,12 +83,16 @@
 
 \let\Bbb\mathblackboard
 
-\unexpanded\def\frak      {\ifmmode\mathfraktur   \fi}
-\unexpanded\def\cal       {\ifmmode\mathscript    \fi}
-\unexpanded\def\bbd       {\ifmmode\mathblackboard\fi}
-\unexpanded\def\blackboard{\ifmmode\mathblackboard\fi}
-\unexpanded\def\fraktur   {\ifmmode\mathfraktur   \fi}
-\unexpanded\def\gothic    {\ifmmode\mathfraktur   \fi}
+\unexpanded\def\frak      {\ifmmode\expandafter\mathfraktur   \fi}
+\unexpanded\def\cal       {\ifmmode\expandafter\mathscript    \fi}
+\unexpanded\def\bbd       {\ifmmode\expandafter\mathblackboard\fi}
+\unexpanded\def\blackboard{\ifmmode\expandafter\mathblackboard\fi}
+\unexpanded\def\fraktur   {\ifmmode\expandafter\mathfraktur   \fi}
+\unexpanded\def\gothic    {\ifmmode\expandafter\mathfraktur   \fi}
+
+\unexpanded\def\mathcal #1{{\setmathalphabet{script}#1}}      % for AMS compatibility
+\unexpanded\def\mathfrak#1{{\setmathalphabet{fraktur}#1}}     % for AMS compatibility
+\unexpanded\def\mathbb  #1{{\setmathalphabet{blackboard}#1}}  % for AMS compatibility
 
 \let\normalmr\mr
 
@@ -484,7 +489,6 @@
     \crampedscriptstyle       \or \or % 4 -> 5
     \crampedscriptscriptstyle \fi     % 6 -> 7
     #1}}
-
 
 %D Something similar can be used in the (re|)|definition
 %D of \type {\text}. This version is a variation on the one
