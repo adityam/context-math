@@ -6,8 +6,8 @@ if not modules then modules = { } end modules ['math-dim'] = {
     license   = "see context related readme files"
 }
 
--- Beware: only Taco really understands what these dimensions do so if you
--- run into problems ...
+-- Beware: only Taco really understands in depth what these dimensions do so
+-- if you run into problems ...
 
 local abs, next = math.abs, next
 
