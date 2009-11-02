@@ -7,7 +7,8 @@ if not modules then modules = { } end modules ['math-vfu'] = {
 }
 
 -- All these math vectors .. thanks to Aditya and Mojca they become
--- better and better.
+-- better and better. If you have problems with math fonts or miss
+-- characters report it to the ConTeXt mailing list.
 
 local type, next = type, next
 
@@ -1546,6 +1547,42 @@ mathematics.make_font ( "tx-math", {
     { name = "txex.tfm", vector = "tex-ex", extension = true } ,
     { name = "txsya.tfm", vector = "tex-ma" },
     { name = "txsyb.tfm", vector = "tex-mb" },
+} )
+
+mathematics.make_font ( "antykwa-math", {
+    { name = "file:AntykwaTorunska-Regular", features = "virtualmath", main = true },
+    { name = "mi-anttri.tfm", vector = "tex-mi", skewchar=0x7F },
+    { name = "sy-anttrz.tfm", vector = "tex-sy", skewchar=0x30, parameters = true } ,
+    { name = "ex-anttr.tfm", vector = "tex-ex", extension = true } ,
+    { name = "msam10.tfm", vector = "tex-ma" },
+    { name = "msbm10.tfm", vector = "tex-mb" },
+} )
+
+mathematics.make_font ( "antykwa-light-math", {
+    { name = "file:AntykwaTorunskaLight-Regular", features = "virtualmath", main = true },
+    { name = "mi-anttli.tfm", vector = "tex-mi", skewchar=0x7F },
+    { name = "sy-anttlz.tfm", vector = "tex-sy", skewchar=0x30, parameters = true } ,
+    { name = "ex-anttl.tfm", vector = "tex-ex", extension = true } ,
+    { name = "msam10.tfm", vector = "tex-ma" },
+    { name = "msbm10.tfm", vector = "tex-mb" },
+} )
+
+mathematics.make_font ( "antykwa-cond-math", {
+    { name = "file:AntykwaTorunskaCond-Regular", features = "virtualmath", main = true },
+    { name = "mi-anttcri.tfm", vector = "tex-mi", skewchar=0x7F },
+    { name = "sy-anttcrz.tfm", vector = "tex-sy", skewchar=0x30, parameters = true } ,
+    { name = "ex-anttcr.tfm", vector = "tex-ex", extension = true } ,
+    { name = "msam10.tfm", vector = "tex-ma" },
+    { name = "msbm10.tfm", vector = "tex-mb" },
+} )
+
+mathematics.make_font ( "antykwa-lightcond-math", {
+    { name = "file:AntykwaTorunskaCondLight-Regular", features = "virtualmath", main = true },
+    { name = "mi-anttcli.tfm", vector = "tex-mi", skewchar=0x7F },
+    { name = "sy-anttclz.tfm", vector = "tex-sy", skewchar=0x30, parameters = true } ,
+    { name = "ex-anttcl.tfm", vector = "tex-ex", extension = true } ,
+    { name = "msam10.tfm", vector = "tex-ma" },
+    { name = "msbm10.tfm", vector = "tex-mb" },
 } )
 
 mathematics.make_font ( "iwona-math", {
