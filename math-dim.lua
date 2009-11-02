@@ -1,6 +1,6 @@
 if not modules then modules = { } end modules ['math-dim'] = {
     version   = 1.001,
-    comment   = "companion to math-ini.tex",
+    comment   = "companion to math-ini.mkiv",
     author    = "Hans Hagen, PRAGMA-ADE, Hasselt NL",
     copyright = "PRAGMA ADE / ConTeXt Development Team",
     license   = "see context related readme files"
@@ -204,7 +204,6 @@ end
 -- local mt = { }  setmetatable(defaults,mt)
 --
 -- mt.__index = function(t,s)
--- texio.write_nl("GETTING " .. s)
 --     return t.default or t.text_style or 0
 -- end
 
@@ -301,7 +300,6 @@ function mathematics.dimensions(dimens)
             StretchStackBottomShiftDown                 = t . under_delimiter_bgap  . text_style,
         }
         d.AccentBaseHeight = 0
-        -- texio.write_nl(table.serialize(d))
         return t, d -- this might change
     else
         return { }, { }

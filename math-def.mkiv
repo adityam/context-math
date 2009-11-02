@@ -39,9 +39,9 @@
     \doifelse{\mathematicsparameter\v!autopunctuation}\v!yes\enablemathpunctuation\disablemathpunctuation
 \to \everysetupmathematics
 
-\appendtoks
-    \ifconditional\automathpunctuation\dosetattribute{mathpunc}\plusone\fi
-\to \everymathematics
+% \appendtoks
+%     \ifconditional\automathpunctuation\dosetattribute{mathpunctuation}\plusone\fi
+% \to \everymathematics
 
 \setupmathematics[\v!autopunctuation=\v!yes]
 
@@ -331,8 +331,8 @@
 
 % tricky .. todo
 
-\appendtoks
-    \def\over{\primitive\over}%
-\to \everymathematics
+% \appendtoks
+%     \def\over{\primitive\over}%
+% \to \everymathematics
 
 \protect \endinput

@@ -1,6 +1,6 @@
 if not modules then modules = { } end modules ['math-noa'] = {
     version   = 1.001,
-    comment   = "companion to math-ini.tex",
+    comment   = "companion to math-ini.mkiv",
     author    = "Hans Hagen, PRAGMA-ADE, Hasselt NL",
     copyright = "PRAGMA ADE / ConTeXt Development Team",
     license   = "see context related readme files"
@@ -89,7 +89,7 @@ local function process(start,what,n)
     if n then n = n + 1 else n = 0 end
     while start do
         if trace_processing then
-            texio.write_nl(format("%s%s",rep("  ",n or 0),tostring(start)))
+            logs.report("math","%s%s",rep("  ",n or 0),tostring(start))
         end
         local id = start.id
         local proc = what[id]
@@ -140,7 +140,8 @@ noads.process = process
 
 -- character remapping
 
-local attribute = attributes.private("mathalph")
+local mathalphabet = attributes.private("mathalphabet")
+local mathgreek    = attributes.private("mathgreek")
 
 noads.processors.relocate = { }
 
@@ -151,14 +152,47 @@ end
 local remap_alphabets = mathematics.remap_alphabets
 local fcs = fonts.color.set
 
+-- we can have a global famdata == fonts.famdata and chrdata == fonts.chrdata
+
+--~ This does not work out well, as there are no fallbacks. Ok, we could
+--~ define a poor mans simplify mechanism.
+--~
+--~ local function checked(pointer)
+--~     local char = pointer.char
+--~     local fam = pointer.fam
+--~     local id = font_of_family(fam)
+--~     local tfmdata = fontdata[id]
+--~     local tc = tfmdata and tfmdata.characters
+--~     if not tc[char] then
+--~         local specials = characters.data[char].specials
+--~         if specials and (specials[1] == "char" or specials[1] == "font") then
+--~             newchar = specials[#specials]
+--~             if trace_remapping then
+--~                 report_remap("fallback",id,char,newchar)
+--~             end
+--~             if trace_analyzing then
+--~                 fcs(pointer,"font:isol")
+--~             end
+--~             pointer.char = newchar
+--~             return true
+--~         end
+--~     end
+--~ end
+
 noads.processors.relocate[math_char] = function(pointer)
-    local a = has_attribute(pointer,attribute)
-    if a and a > 0 then
-        local fam = pointer.fam
-        set_attribute(pointer,attribute,0)
+    local g = has_attribute(pointer,mathgreek) or 0
+    local a = has_attribute(pointer,mathalphabet) or 0
+    if a > 0 or g > 0 then
+        if a > 0 then
+            set_attribute(pointer,mathgreek,0)
+        end
+        if g > 0 then
+            set_attribute(pointer,mathalphabet,0)
+        end
         local char = pointer.char
-        local newchar = remap_alphabets(a,char)
+        local newchar = remap_alphabets(char,a,g)
         if newchar then
+            local fam = pointer.fam
             local id = font_of_family(fam)
             local tfmdata = fontdata[id]
             if tfmdata and tfmdata.characters[newchar] then -- we could probably speed this up
@@ -169,11 +203,15 @@ noads.processors.relocate[math_char] = function(pointer)
                     fcs(pointer,"font:isol")
                 end
                 pointer.char = newchar
-                return
+                return true
             elseif trace_remapping then
                 report_remap("char",id,char,newchar," fails")
             end
+        else
+            -- return checked(pointer)
         end
+    else
+        -- return checked(pointer)
     end
     if trace_analyzing then
         fcs(pointer,"font:medi")
@@ -207,15 +245,15 @@ end
 -- todo: just replace the character by an ord noad
 -- and remove the right delimiter as well
 
-local attribute = attributes.private("mathsize")
+local mathsize = attributes.private("mathsize")
 
 noads.processors.resize = { }
 
 noads.processors.resize[math_fence] = function(pointer)
     if pointer.subtype == 1 then -- left
-        local a = has_attribute(pointer,attribute)
+        local a = has_attribute(pointer,mathsize)
         if a and a > 0 then
-            set_attribute(pointer,attribute,0)
+            set_attribute(pointer,mathsize,0)
             local d = pointer.delim
             local df = d.small_fam
             local id = font_of_family(df)
@@ -234,7 +272,7 @@ end
 
 -- respacing
 
-local attribute = attributes.private("mathpunc")
+local mathpunctuation = attributes.private("mathpunctuation")
 
 noads.processors.respace = { }
 
@@ -244,9 +282,9 @@ local chardata = characters.data
 
 noads.processors.respace[math_noad] = function(pointer)
     if pointer.subtype == noad_ord then
-        local a = has_attribute(pointer,attribute)
+        local a = has_attribute(pointer,mathpunctuation)
         if a and a > 0 then
-            set_attribute(pointer,attribute,0)
+            set_attribute(pointer,mathpunctuation,0)
             local current_nucleus = pointer.nucleus
             if current_nucleus.id == math_char then
                 local current_char = current_nucleus.char
@@ -315,7 +353,7 @@ local starttiming, stoptiming = statistics.starttiming, statistics.stoptiming
 
 function nodes.processors.mlist_to_hlist(head,style,penalties)
     starttiming(noads)
-    local head, done = actions(head,nil,style,penalties)
+    local head, done = actions(head,style,penalties)
     stoptiming(noads)
     return head, done
 end

@@ -1,6 +1,6 @@
 if not modules then modules = { } end modules ['math-vfu'] = {
     version   = 1.001,
-    comment   = "companion to math-ini.tex",
+    comment   = "companion to math-ini.mkiv",
     author    = "Hans Hagen, PRAGMA-ADE, Hasselt NL",
     copyright = "PRAGMA ADE / ConTeXt Development Team",
     license   = "see context related readme files"
@@ -223,24 +223,40 @@ function fonts.vf.math.alas(main,id,size)
     arrow(main,0x2192,0xFE192,0xFF501,false) -- right
 end
 
-local reverse -- index -> unicode
+local unique = 0 -- testcase: \startTEXpage \math{!\text{-}\text{-}\text{-}} \stopTEXpage
 
-function fonts.basecopy(tfmtable)
+function fonts.basecopy(tfmtable,name)
+    local characters, parameters, fullname = tfmtable.characters, tfmtable.parameters, tfmtable.fullname
     local t, c, p = { }, { }, { }
     for k, v in next, tfmtable do
         t[k] = v
     end
-    for k, v in next, tfmtable.characters do
-        c[k] = v
+    if characters then
+        for k, v in next, characters do
+            c[k] = v
+        end
+        t.characters = c
+    else
+        logs.report("math virtual","font %s has no characters",name)
     end
-    for k, v in next, tfmtable.parameters do
-        p[k] = v
+    if parameters then
+        for k, v in next, parameters do
+            p[k] = v
+        end
+        t.parameters = p
+    else
+        logs.report("math virtual","font %s has no parameters",name)
     end
-    t.characters, t.parameters = c, p
+    -- tricky ... what if fullname does not exist
+    if fullname then
+        unique = unique + 1
+        t.fullname = fullname .. "-" .. unique
+    end
     return t
 end
 
 local reported = { }
+local reverse -- index -> unicode
 
 function fonts.vf.math.define(specification,set)
     if not reverse then
@@ -257,7 +273,6 @@ function fonts.vf.math.define(specification,set)
     local size = specification.size -- given size
     local fnt, lst, main = { }, { }, nil
     local start = (trace_virtual or trace_timings) and os.clock()
---~ texio.write_nl("defining font " .. name .. " " .. size)
     local okset, n = { }, 0
     for s=1,#set do
         local ss = set[s]
@@ -285,10 +300,14 @@ function fonts.vf.math.define(specification,set)
         end
     end
     -- beware, fnt[1] is already passed to tex (we need to make a simple copy then .. todo)
-    main = fonts.basecopy(fnt[1])
+    main = fonts.basecopy(fnt[1],name)
     main.name, main.fonts, main.virtualized, main.math_parameters = name, lst, true, { }
     local characters, descriptions = main.characters, main.descriptions
-    main.parameters.x_height = main.parameters.x_height or 0
+    local mp = main.parameters
+    if mp then
+        mp.x_height = mp.x_height or 0
+    end
+    local already_reported = false
     for s=1,n do
         local ss, fs = okset[s], fnt[s]
         if not fs then
@@ -297,34 +316,38 @@ function fonts.vf.math.define(specification,set)
             -- skip, redundant
         else
             local mm, fp = main.math_parameters, fs.parameters
-            if ss.extension then
-                mm.math_x_height          = fp.x_height or 0 -- math_x_height           height of x
-                mm.default_rule_thickness = fp[ 8] or 0 -- default_rule_thickness  thickness of \over bars
-                mm.big_op_spacing1        = fp[ 9] or 0 -- big_op_spacing1         minimum clearance above a displayed op
-                mm.big_op_spacing2        = fp[10] or 0 -- big_op_spacing2         minimum clearance below a displayed op
-                mm.big_op_spacing3        = fp[11] or 0 -- big_op_spacing3         minimum baselineskip above displayed op
-                mm.big_op_spacing4        = fp[12] or 0 -- big_op_spacing4         minimum baselineskip below displayed op
-                mm.big_op_spacing5        = fp[13] or 0 -- big_op_spacing5         padding above and below displayed limits
-            --  logs.report("math virtual","loading and virtualizing font %s at size %s, setting ex parameters",name,size)
-            elseif ss.parameters then
-                main.parameters.x_height = fp.x_height or main.parameters.x_height
-                mm.x_height      = mm.x_height or fp.x_height or 0 -- x_height                height of x
-                mm.num1          = fp[ 8] or 0 -- num1                    numerator shift-up in display styles
-                mm.num2          = fp[ 9] or 0 -- num2                    numerator shift-up in non-display, non-\atop
-                mm.num3          = fp[10] or 0 -- num3                    numerator shift-up in non-display \atop
-                mm.denom1        = fp[11] or 0 -- denom1                  denominator shift-down in display styles
-                mm.denom2        = fp[12] or 0 -- denom2                  denominator shift-down in non-display styles
-                mm.sup1          = fp[13] or 0 -- sup1                    superscript shift-up in uncramped display style
-                mm.sup2          = fp[14] or 0 -- sup2                    superscript shift-up in uncramped non-display
-                mm.sup3          = fp[15] or 0 -- sup3                    superscript shift-up in cramped styles
-                mm.sub1          = fp[16] or 0 -- sub1                    subscript shift-down if superscript is absent
-                mm.sub2          = fp[17] or 0 -- sub2                    subscript shift-down if superscript is present
-                mm.sup_drop      = fp[18] or 0 -- sup_drop                superscript baseline below top of large box
-                mm.sub_drop      = fp[19] or 0 -- sub_drop                subscript baseline below bottom of large box
-                mm.delim1        = fp[20] or 0 -- delim1                  size of \atopwithdelims delimiters in display styles
-                mm.delim2        = fp[21] or 0 -- delim2                  size of \atopwithdelims delimiters in non-displays
-                mm.axis_height   = fp[22] or 0 -- axis_height             height of fraction lines above the baseline
-            --  logs.report("math virtual","loading and virtualizing font %s at size %s, setting sy parameters",name,size)
+            if mm and fp and mp then
+                if ss.extension then
+                    mm.math_x_height          = fp.x_height or 0 -- math_x_height           height of x
+                    mm.default_rule_thickness = fp[ 8] or 0 -- default_rule_thickness  thickness of \over bars
+                    mm.big_op_spacing1        = fp[ 9] or 0 -- big_op_spacing1         minimum clearance above a displayed op
+                    mm.big_op_spacing2        = fp[10] or 0 -- big_op_spacing2         minimum clearance below a displayed op
+                    mm.big_op_spacing3        = fp[11] or 0 -- big_op_spacing3         minimum baselineskip above displayed op
+                    mm.big_op_spacing4        = fp[12] or 0 -- big_op_spacing4         minimum baselineskip below displayed op
+                    mm.big_op_spacing5        = fp[13] or 0 -- big_op_spacing5         padding above and below displayed limits
+                --  logs.report("math virtual","loading and virtualizing font %s at size %s, setting ex parameters",name,size)
+                elseif ss.parameters then
+                    mp.x_height      = fp.x_height or mp.x_height
+                    mm.x_height      = mm.x_height or fp.x_height or 0 -- x_height                height of x
+                    mm.num1          = fp[ 8] or 0 -- num1                    numerator shift-up in display styles
+                    mm.num2          = fp[ 9] or 0 -- num2                    numerator shift-up in non-display, non-\atop
+                    mm.num3          = fp[10] or 0 -- num3                    numerator shift-up in non-display \atop
+                    mm.denom1        = fp[11] or 0 -- denom1                  denominator shift-down in display styles
+                    mm.denom2        = fp[12] or 0 -- denom2                  denominator shift-down in non-display styles
+                    mm.sup1          = fp[13] or 0 -- sup1                    superscript shift-up in uncramped display style
+                    mm.sup2          = fp[14] or 0 -- sup2                    superscript shift-up in uncramped non-display
+                    mm.sup3          = fp[15] or 0 -- sup3                    superscript shift-up in cramped styles
+                    mm.sub1          = fp[16] or 0 -- sub1                    subscript shift-down if superscript is absent
+                    mm.sub2          = fp[17] or 0 -- sub2                    subscript shift-down if superscript is present
+                    mm.sup_drop      = fp[18] or 0 -- sup_drop                superscript baseline below top of large box
+                    mm.sub_drop      = fp[19] or 0 -- sub_drop                subscript baseline below bottom of large box
+                    mm.delim1        = fp[20] or 0 -- delim1                  size of \atopwithdelims delimiters in display styles
+                    mm.delim2        = fp[21] or 0 -- delim2                  size of \atopwithdelims delimiters in non-displays
+                    mm.axis_height   = fp[22] or 0 -- axis_height             height of fraction lines above the baseline
+                --  logs.report("math virtual","loading and virtualizing font %s at size %s, setting sy parameters",name,size)
+                end
+            else
+                logs.report("math virtual","font %s, no parameters set",name)
             end
             local vectorname = ss.vector
             if vectorname then
@@ -337,14 +360,19 @@ function fonts.vf.math.define(specification,set)
                     for unicode, index in next, vector do
                         local fci = fc[index]
                         if not fci then
-                            local fontname = fs.name
+                            local fontname = fs.name or "unknown"
                             local rf = reported[fontname]
                             if not rf then rf = { } reported[fontname] = rf end
                             local rv = rf[vectorname]
                             if not rv then rv = { } rf[vectorname] = rv end
                             local ru = rv[unicode]
                             if not ru then
-                                logs.report("math virtual", "unicode point U+%05X has no index %04X in vector %s for font %s",unicode,index,vectorname,fontname)
+                                if trace_virtual then
+                                    logs.report("math virtual", "unicode point U+%05X has no index %04X in vector %s for font %s",unicode,index,vectorname,fontname)
+                                elseif not already_reported then
+                                    logs.report("math virtual", "the mapping is incomplete for '%s' at %s",name,size)
+                                    already_reported = true
+                                end
                                 rv[unicode] = true
                             end
                         else
@@ -505,14 +533,16 @@ function fonts.vf.math.define(specification,set)
         end
     end
     lst[#lst+1] = { id = font.nextid(), size = size }
-    fonts.vf.math.alas(main,#lst,size)
+    if mp then -- weak catch
+        fonts.vf.math.alas(main,#lst,size)
+    end
     if trace_virtual or trace_timings then
         logs.report("math virtual","loading and virtualizing font %s at size %s took %0.3f seconds",name,size,os.clock()-start)
     end
     main.has_italic = true
     main.type = "virtual" -- not needed
     mathematics.scaleparameters(main,main,1)
-main.nomath = false
+    main.nomath = false
     return main
 end
 
@@ -690,8 +720,8 @@ fonts.enc.math["tex-mi"] = {
     [0x021BD] = 0x29, -- leftharpoondown
     [0x021C0] = 0x2A, -- righttharpoonup
     [0x021C1] = 0x2B, -- rightharpoondown
-    --          0x2C, -- lhook (hook for combining arrows)
-    --          0x2D, -- rhook (hook for combining arrows)
+    [0xFE322] = 0x2C, -- lhook (hook for combining arrows)
+    [0xFE323] = 0x2D, -- rhook (hook for combining arrows)
     [0x022B3] = 0x2E, -- triangleright (TODO: which one is right?)
     [0x022B2] = 0x2F, -- triangleleft (TODO: which one is right?)
 --  [0x00041] = 0x30, -- 0
@@ -1312,7 +1342,7 @@ mathematics.make_font ( "lmroman5-math", {
     { name = "msam5.tfm", vector = "tex-ma" },
     { name = "msbm5.tfm", vector = "tex-mb" },
  -- { name = "rm-lmbx5.tfm", vector = "tex-bf" } ,
-    { name = "lmroman5-bold", "tex-bf" } ,
+    { name = "lmroman5-bold", vector = "tex-bf" } ,
     { name = "lmmib5.tfm", vector = "tex-bi", skewchar=0x7F } ,
     { name = "lmsans8-regular.otf", vector = "tex-ss", optional=true },
     { name = "lmmono8-regular.otf", vector = "tex-tt", optional=true },
@@ -1333,7 +1363,7 @@ mathematics.make_font ( "lmroman6-math", {
     { name = "msam5.tfm", vector = "tex-ma" },
     { name = "msbm5.tfm", vector = "tex-mb" },
  -- { name = "rm-lmbx6.tfm", vector = "tex-bf" } ,
-    { name = "lmroman6-bold.otf", "tex-bf" } ,
+    { name = "lmroman6-bold.otf", vector = "tex-bf" } ,
     { name = "lmmib5.tfm", vector = "tex-bi", skewchar=0x7F } ,
     { name = "lmsans8-regular.otf", vector = "tex-ss", optional=true },
     { name = "lmmono8-regular.otf", vector = "tex-tt", optional=true },
@@ -1357,7 +1387,7 @@ mathematics.make_font ( "lmroman7-math", {
     { name = "msam7.tfm", vector = "tex-ma" },
     { name = "msbm7.tfm", vector = "tex-mb" },
  -- { name = "rm-lmbx7.tfm", vector = "tex-bf" } ,
-    { name = "lmroman7-bold.otf", "tex-bf" } ,
+    { name = "lmroman7-bold.otf", vector = "tex-bf" } ,
     { name = "lmmib7.tfm", vector = "tex-bi", skewchar=0x7F } ,
     { name = "lmsans8-regular.otf", vector = "tex-ss", optional=true },
     { name = "lmmono8-regular.otf", vector = "tex-tt", optional=true },
@@ -1379,7 +1409,7 @@ mathematics.make_font ( "lmroman8-math", {
     { name = "msam7.tfm", vector = "tex-ma" },
     { name = "msbm7.tfm", vector = "tex-mb" },
  -- { name = "rm-lmbx8.tfm", vector = "tex-bf" } ,
-    { name = "lmroman8-bold.otf", "tex-bf" } ,
+    { name = "lmroman8-bold.otf", vector = "tex-bf" } ,
     { name = "lmmib7.tfm", vector = "tex-bi", skewchar=0x7F } ,
     { name = "lmsans8-regular.otf", vector = "tex-ss", optional=true },
     { name = "lmmono8-regular.otf", vector = "tex-tt", optional=true },
@@ -1401,7 +1431,7 @@ mathematics.make_font ( "lmroman9-math", {
     { name = "msam10.tfm", vector = "tex-ma" },
     { name = "msbm10.tfm", vector = "tex-mb" },
  -- { name = "rm-lmbx9.tfm", vector = "tex-bf" } ,
-    { name = "lmroman9-bold.otf", "tex-bf" } ,
+    { name = "lmroman9-bold.otf", vector = "tex-bf" } ,
     { name = "lmmib10.tfm", vector = "tex-bi", skewchar=0x7F } ,
     { name = "lmsans9-regular.otf", vector = "tex-ss", optional=true },
     { name = "lmmono9-regular.otf", vector = "tex-tt", optional=true },
@@ -1426,7 +1456,7 @@ mathematics.make_font ( "lmroman10-math", {
     { name = "msam10.tfm", vector = "tex-ma" },
     { name = "msbm10.tfm", vector = "tex-mb" },
  -- { name = "rm-lmbx10.tfm", vector = "tex-bf" } ,
-    { name = "lmroman10-bold.otf", "tex-bf" } ,
+    { name = "lmroman10-bold.otf", vector = "tex-bf" } ,
     { name = "lmmib10.tfm", vector = "tex-bi", skewchar=0x7F } ,
     { name = "lmsans10-regular.otf", vector = "tex-ss", optional=true },
     { name = "lmmono10-regular.otf", vector = "tex-tt", optional=true },
@@ -1444,7 +1474,7 @@ mathematics.make_font ( "lmroman10-boldmath", {
     { name = "msam10.tfm", vector = "tex-ma" },
     { name = "msbm10.tfm", vector = "tex-mb" },
  -- { name = "rm-lmbx10.tfm", vector = "tex-bf" } ,
-    { name = "lmroman10-bold.otf", "tex-bf" } ,
+    { name = "lmroman10-bold.otf", vector = "tex-bf" } ,
     { name = "lmmib10.tfm", vector = "tex-bi", skewchar=0x7F } ,
     { name = "lmsans10-regular.otf", vector = "tex-ss", optional=true },
     { name = "lmmono10-regular.otf", vector = "tex-tt", optional=true },
@@ -1465,7 +1495,7 @@ mathematics.make_font ( "lmroman12-math", {
     { name = "msam10.tfm", vector = "tex-ma" },
     { name = "msbm10.tfm", vector = "tex-mb" },
  -- { name = "rm-lmbx12.tfm", vector = "tex-bf" } ,
-    { name = "lmroman12-bold.otf", "tex-bf" } ,
+    { name = "lmroman12-bold.otf", vector = "tex-bf" } ,
     { name = "lmmib10.tfm", vector = "tex-bi", skewchar=0x7F } ,
     { name = "lmsans12-regular.otf", vector = "tex-ss", optional=true },
     { name = "lmmono12-regular.otf", vector = "tex-tt", optional=true },
@@ -1484,7 +1514,7 @@ mathematics.make_font ( "lmroman17-math", {
     { name = "msam10.tfm", vector = "tex-ma" },
     { name = "msbm10.tfm", vector = "tex-mb" },
  -- { name = "rm-lmbx12.tfm", vector = "tex-bf" } ,
-    { name = "lmroman12-bold.otf", "tex-bf" } ,
+    { name = "lmroman12-bold.otf", vector = "tex-bf" } ,
     { name = "lmmib10.tfm", vector = "tex-bi", skewchar=0x7F } ,
     { name = "lmsans17-regular.otf", vector = "tex-ss", optional=true },
     { name = "lmmono17-regular.otf", vector = "tex-tt", optional=true },
@@ -1559,4 +1589,53 @@ mathematics.make_font ( "mathtimes-math", {
     { name = "mtex.tfm", vector = "tex-ex", extension = true },
     { name = "msam10.tfm", vector = "tex-ma" },
     { name = "msbm10.tfm", vector = "tex-mb" },
+} )
+
+mathematics.make_font ( "lucida-math", {
+    { name = "lbr.afm", features = "virtualmath", main = true },
+    { name = "hlcrim.tfm", vector = "tex-mi", skewchar=0x7F },
+    { name = "hlcry.tfm", vector = "tex-sy", skewchar=0x30, parameters = true },
+    { name = "hlcrv.tfm", vector = "tex-ex", extension = true },
+    { name = "hlcra.tfm", vector = "tex-ma" },
+    { name = "hlcrm.tfm", vector = "tex-mb" },
+} )
+
+mathematics.make_font ( "charter-math", {
+    { name = "file:bchr8a", features = "virtualmath", main = true },
+ -- { name = "md-chr7m.tfm", vector = "tex-mr" },
+    { name = "md-chri7m.tfm", vector = "tex-mi", skewchar=0x7F },
+    { name = "md-chr7y.tfm", vector = "tex-sy", skewchar=0x30, parameters = true },
+    { name = "md-chr7v.tfm", vector = "tex-ex", extension = true },
+    { name = "msam10.tfm", vector = "tex-ma" },
+    { name = "msbm10.tfm", vector = "tex-mb" },
+} )
+
+mathematics.make_font ( "garamond-math", {
+    { name = "file:ugmr8y", features = "virtualmath", main = true },
+ -- { name = "md-gmr7m.tfm", vector = "tex-mr" },
+    { name = "md-gmri7m.tfm", vector = "tex-mi", skewchar=0x7F },
+    { name = "md-gmr7y.tfm", vector = "tex-sy", skewchar=0x30, parameters = true },
+    { name = "md-gmr7v.tfm", vector = "tex-ex", extension = true },
+    { name = "msam10.tfm", vector = "tex-ma" },
+    { name = "msbm10.tfm", vector = "tex-mb" },
+} )
+
+mathematics.make_font ( "utopia-math", {
+    { name = "file:putr8y", features = "virtualmath", main = true },
+ -- { name = "md-utr7m.tfm", vector = "tex-mr" },
+    { name = "md-utri7m.tfm", vector = "tex-mi", skewchar=0x7F },
+    { name = "md-utr7y.tfm", vector = "tex-sy", skewchar=0x30, parameters = true },
+    { name = "md-utr7v.tfm", vector = "tex-ex", extension = true },
+    { name = "msam10.tfm", vector = "tex-ma" },
+    { name = "msbm10.tfm", vector = "tex-mb" },
+} )
+
+mathematics.make_font ( "hvmath-math", {
+    { name = "file:texgyreheros-regular.otf", features = "virtualmath", main = true },
+    { name = "hvrm108r.tfm", vector="tex-mr" },
+    { name = "hvmi10.tfm", vector = "tex-mi", skewchar=0x7F },
+    { name = "hvsy10.tfm", vector = "tex-sy", skewchar=0x30, parameters = true },
+    { name = "hvex10.tfm", vector = "tex-ex", extension = true },
+    { name = "hvam10.tfm", vector = "tex-ma" },
+    { name = "hvbm10.tfm", vector = "tex-mb" },
 } )

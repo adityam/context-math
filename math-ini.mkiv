@@ -29,6 +29,11 @@
 
 \ifx\v!compact\undefined \def\v!compact{compact} \fi
 
+%D New:
+
+\let\startimath\Ustartmath         \let\stopimath \Ustopmath
+\let\startdmath\Ustartdisplaymath  \let\stopdmath \Ustopmath
+
 %D We move these definitions into the format:
 
 % test [[\char948 \ctxlua{tex.sprint(utf.char(948))}]]
@@ -42,19 +47,23 @@
 \registerctxluafile{math-map}{1.001}
 \registerctxluafile{math-noa}{1.001}
 
-\definesystemattribute[mathalph]
+\definesystemattribute[mathalphabet]
 \definesystemattribute[mathsize]
-\definesystemattribute[mathpunc]
+\definesystemattribute[mathpunctuation]
+\definesystemattribute[mathgreek]
 
 % todo: only in mmode
 
-% \def\setmathattribute#1#2{\dosetattribute{mathalph}{\ctxlua{tex.sprint(mathematics.sync_a_both (\number\dogetattribute{mathalph},"#1","#2"))}}}
-% \def\setmathalphabet   #1{\dosetattribute{mathalph}{\ctxlua{tex.sprint(mathematics.sync_a_name (\number\dogetattribute{mathalph},"#1"))}}}
-% \def\setmathstyle      #1{\dosetattribute{mathalph}{\ctxlua{tex.sprint(mathematics.sync_a_style(\number\dogetattribute{mathalph},"#1"))}}}
+\unexpanded\def\mathgreekupright{\dosetattribute  {mathgreek}{11}}
+\unexpanded\def\mathgreekitalic {\dosetattribute  {mathgreek}{22}}
+\unexpanded\def\mathgreekdefault{\doresetattribute{mathgreek}}
 
-\def\setmathattribute#1#2{\ctxlua{mathematics.sync_a_both ("#1","#2")}}
-\def\setmathalphabet   #1{\ctxlua{mathematics.sync_a_name ("#1")}}
-\def\setmathstyle      #1{\ctxlua{mathematics.sync_a_style("#1")}}
+\let\mathgreeknormal\mathgreekupright
+\let\mathgreeknone  \mathgreekdefault
+
+\def\setmathattribute#1#2{\ifmmode\ctxlua{mathematics.sync_a_both ("#1","#2")}\fi}
+\def\setmathalphabet   #1{\ifmmode\ctxlua{mathematics.sync_a_name ("#1")}\fi}
+\def\setmathstyle      #1{\ifmmode\ctxlua{mathematics.sync_a_style("#1")}\fi}
 
 \unexpanded\def\mr            {\setmathattribute{regular}{tf}}
 
@@ -90,17 +99,37 @@
 \unexpanded\def\fraktur   {\ifmmode\expandafter\mathfraktur   \fi}
 \unexpanded\def\gothic    {\ifmmode\expandafter\mathfraktur   \fi}
 
-\unexpanded\def\mathcal #1{{\setmathalphabet{script}#1}}      % for AMS compatibility
-\unexpanded\def\mathfrak#1{{\setmathalphabet{fraktur}#1}}     % for AMS compatibility
-\unexpanded\def\mathbb  #1{{\setmathalphabet{blackboard}#1}}  % for AMS compatibility
+\unexpanded\def\mathcal #1{{\mathscript    #1}}  % for AMS compatibility
+\unexpanded\def\mathfrak#1{{\mathfraktur   #1}}  % for AMS compatibility
+\unexpanded\def\mathbb  #1{{\mathblackboard#1}}  % for AMS compatibility
 
 \let\normalmr\mr
 
+% \prependtoks
+%     \let\mr\normalmr
+%     \let\rm\mathrm \let\ss\mathss \let\tt\mathtt
+%     \let\tf\mathtf \let\bf\mathbf \let\it\mathit \let\sl\mathsl \let\bi\mathbi \let\bs\mathbs
+%     \let\frak\mathfraktur \let\cal\mathscript \let\bbd\mathblackboard
+%     \mathdefault
+% \to \everymathematics
+
+\let\normaltf\tf \unexpanded\def\tf{\ifmmode\mathtf\else\normaltf\fi}
+\let\normalbf\bf \unexpanded\def\bf{\ifmmode\mathbf\else\normalbf\fi}
+\let\normalit\it \unexpanded\def\it{\ifmmode\mathit\else\normalit\fi}
+\let\normalsl\sl \unexpanded\def\sl{\ifmmode\mathsl\else\normalsl\fi}
+\let\normalbi\bi \unexpanded\def\bi{\ifmmode\mathbi\else\normalbi\fi}
+\let\normalbs\bs \unexpanded\def\bs{\ifmmode\mathbs\else\normalbs\fi}
+
+\let\normalrm\rm \unexpanded\def\rm{\ifmmode\mathrm\else\normalrm\fi}
+\let\normalss\ss \unexpanded\def\ss{\ifmmode\mathss\else\normalss\fi}
+\let\normaltt\tt \unexpanded\def\tt{\ifmmode\mathtt\else\normaltt\fi}
+                 \unexpanded\def\mr{\ifmmode            \normalmr\fi}
+
 \prependtoks
-    \let\mr\normalmr
-    \let\rm\mathrm \let\ss\mathss \let\tt\mathtt
-    \let\tf\mathtf \let\bf\mathbf \let\it\mathit \let\sl\mathsl \let\bi\mathbi \let\bs\mathbs
-    \let\frak\mathfraktur \let\cal\mathscript \let\bbd\mathblackboard
+%     \let\mr\normalmr
+%     \let\rm\mathrm \let\ss\mathss \let\tt\mathtt
+%     \let\tf\mathtf \let\bf\mathbf \let\it\mathit \let\sl\mathsl \let\bi\mathbi \let\bs\mathbs
+%     \let\frak\mathfraktur \let\cal\mathscript \let\bbd\mathblackboard
     \mathdefault
 \to \everymathematics
 
@@ -387,7 +416,7 @@
 \mathcode`\_="8000 % \_
 
 %D \macros
-%D   {\setupmathematics}
+%D   {setupmathematics}
 %D
 %D Configuration for integrals. (If needed we can speed this up and make it
 %D installable; no processaction is needed then).
@@ -414,6 +443,37 @@
 \setupmathematics
   [\v!compact=no]
 
+%D Delayed: greek.
+%D
+%D \starttyping
+%D \usetypescript[cambria]\setupbodyfont[cambria]
+%D \startTEXpage
+%D     $\alpha \mathgreekupright \alpha \mathgreekitalic \alpha$
+%D \stopTEXpage
+%D \stoptyping
+
+% [lc uc] normal (upright) = 2, italic = 3, none = 0/1
+
+\setevalue{\??mo:greek:\v!normal :\v!normal}{\dosetattribute  {mathgreek}{22}}
+\setevalue{\??mo:greek:\v!normal :\v!italic}{\dosetattribute  {mathgreek}{23}}
+\setevalue{\??mo:greek:\v!normal :\v!none  }{\dosetattribute  {mathgreek}{21}}
+
+\setevalue{\??mo:greek:\v!italic :\v!normal}{\dosetattribute  {mathgreek}{32}}
+\setevalue{\??mo:greek:\v!italic :\v!italic}{\dosetattribute  {mathgreek}{33}}
+\setevalue{\??mo:greek:\v!italic :\v!none  }{\dosetattribute  {mathgreek}{31}}
+
+\setevalue{\??mo:greek:\v!none   :\v!normal}{\dosetattribute  {mathgreek}{12}}
+\setevalue{\??mo:greek:\v!none   :\v!italic}{\dosetattribute  {mathgreek}{13}}
+\setevalue{\??mo:greek:\v!none   :\v!none  }{\doresetattribute{mathgreek}}
+
+\appendtoks
+    \csname\??mo:greek:\@@molcgreek:\@@moucgreek\endcsname
+\to \everymathematics
+
+\setupmathematics
+  [lcgreek=\v!italic,
+   ucgreek=\v!none]
+
 %D \macros
 %D   {enablemathpunctuation,disablemathpunctuation}
 %D
@@ -437,7 +497,7 @@
 \to \everysetupmathematics
 
 \appendtoks
-    \ifconditional\automathpunctuation\dosetattribute{mathpunc}\plusone\fi
+    \ifconditional\automathpunctuation\dosetattribute{mathpunctuation}\plusone\fi
 \to \everymathematics
 
 \setupmathematics
@@ -580,5 +640,7 @@
 % force text mode, will be overloaded later
 
 \ifx\text\undefined \let\text\hbox \fi
+
+\def\mathoptext#1{\mathop{\text{#1}}}
 
 \protect \endinput

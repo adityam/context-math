@@ -1,6 +1,6 @@
 if not modules then modules = { } end modules ['math-ext'] = {
     version   = 1.001,
-    comment   = "companion to math-ini.tex",
+    comment   = "companion to math-ini.mkiv",
     author    = "Hans Hagen, PRAGMA-ADE, Hasselt NL",
     copyright = "PRAGMA ADE / ConTeXt Development Team",
     license   = "see context related readme files"
@@ -68,6 +68,7 @@ classes.variable    = classes.alphabetic
 classes.number      = classes.alphabetic
 
 -- there will be proper functions soon (and we will move this code in-line)
+-- no need for " in class and family (saves space)
 
 local function delcode(target,family,slot)
     return format('\\Udelcode%s="%X "%X ',target,family,slot)
