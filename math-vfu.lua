@@ -619,17 +619,17 @@ fonts.enc.math["tex-ex"] = {
 -- font as main font
 
 fonts.enc.math["tex-mr"] = {
-    [0x00393] = 0x00, -- Gamma
-    [0x00394] = 0x01, -- Delta
-    [0x00398] = 0x02, -- Theta
-    [0x0039B] = 0x03, -- Lambda
-    [0x0039E] = 0x04, -- Xi
-    [0x003A0] = 0x05, -- Pi
-    [0x003A3] = 0x06, -- Sigma
-    [0x003A5] = 0x07, -- Upsilon
-    [0x003A6] = 0x08, -- Phi
-    [0x003A8] = 0x09, -- Psi
-    [0x003A9] = 0x0A, -- Omega
+--  [0x00393] = 0x00, -- Gamma
+--  [0x00394] = 0x01, -- Delta
+--  [0x00398] = 0x02, -- Theta
+--  [0x0039B] = 0x03, -- Lambda
+--  [0x0039E] = 0x04, -- Xi
+--  [0x003A0] = 0x05, -- Pi
+--  [0x003A3] = 0x06, -- Sigma
+--  [0x003A5] = 0x07, -- Upsilon
+--  [0x003A6] = 0x08, -- Phi
+--  [0x003A8] = 0x09, -- Psi
+--  [0x003A9] = 0x0A, -- Omega
 --  [0x00060] = 0x12, -- [math]grave
 --  [0x000B4] = 0x13, -- [math]acute
 --  [0x002C7] = 0x14, -- [math]check
@@ -647,29 +647,29 @@ fonts.enc.math["tex-mr"] = {
 --  [0x0003D] = 0x3D, -- =
 --  [0x0003E] = 0x3E, -- >
 --  [0x0003F] = 0x3F, -- ?
-    [0x00391] = 0x41, -- Alpha
-    [0x00392] = 0x42, -- Beta
+--  [0x00391] = 0x41, -- Alpha
+--  [0x00392] = 0x42, -- Beta
     [0x02145] = 0x44,
-    [0x00395] = 0x45, -- Epsilon
-    [0x00397] = 0x48, -- Eta
-    [0x00399] = 0x49, -- Iota
-    [0x0039A] = 0x4B, -- Kappa
-    [0x0039C] = 0x4D, -- Mu
-    [0x0039D] = 0x4E, -- Nu
-    [0x0039F] = 0x4F, -- Omicron
-    [0x003A1] = 0x52, -- Rho
-    [0x003A4] = 0x54, -- Tau
-    [0x003A7] = 0x58, -- Chi
-    [0x00396] = 0x5A, -- Zeta
+--  [0x00395] = 0x45, -- Epsilon
+--  [0x00397] = 0x48, -- Eta
+--  [0x00399] = 0x49, -- Iota
+--  [0x0039A] = 0x4B, -- Kappa
+--  [0x0039C] = 0x4D, -- Mu
+--  [0x0039D] = 0x4E, -- Nu
+--  [0x0039F] = 0x4F, -- Omicron
+--  [0x003A1] = 0x52, -- Rho
+--  [0x003A4] = 0x54, -- Tau
+--  [0x003A7] = 0x58, -- Chi
+--  [0x00396] = 0x5A, -- Zeta
 --  [0x0005B] = 0x5B, -- [
 --  [0x0005D] = 0x5D, -- ]
 --  [0x0005E] = 0x5E, -- [math]hat -- the text one
-    [0x00302] = 0x5E, -- [math]hat -- the real math one
+--  [0x00302] = 0x5E, -- [math]hat -- the real math one
 --  [0x002D9] = 0x5F, -- [math]dot
     [0x02146] = 0x64,
     [0x02147] = 0x65,
 --  [0x002DC] = 0x7E, -- [math]tilde -- the text one
-    [0x00303] = 0x7E, -- [math]tilde -- the real one
+--  [0x00303] = 0x7E, -- [math]tilde -- the real one
 --  [0x000A8] = 0x7F, -- [math]ddot
 }
 
@@ -1335,7 +1335,7 @@ fonts.vf.math.set_digits (fonts.enc.math, "tex-bf", 0x1D7CE)
 
 mathematics.make_font ( "lmroman5-math", {
     { name = "lmroman5-regular.otf", features = "virtualmath", main = true },
- -- { name = "rm-lmr5.tfm", vector = "tex-mr" } ,
+    { name = "rm-lmr5.tfm", vector = "tex-mr" } ,
     { name = "lmmi5.tfm", vector = "tex-mi", skewchar=0x7F },
     { name = "lmsy5.tfm", vector = "tex-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10.tfm", vector = "tex-ex", extension = true } ,
@@ -1356,7 +1356,7 @@ mathematics.make_font ( "lmroman5-math", {
 
 mathematics.make_font ( "lmroman6-math", {
     { name = "lmroman6-regular.otf", features = "virtualmath", main = true },
- -- { name = "rm-lmr6.tfm", vector = "tex-mr" } ,
+    { name = "rm-lmr6.tfm", vector = "tex-mr" } ,
     { name = "lmmi6.tfm", vector = "tex-mi", skewchar=0x7F },
     { name = "lmsy6.tfm", vector = "tex-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10.tfm", vector = "tex-ex", extension = true } ,
@@ -1380,7 +1380,7 @@ mathematics.make_font ( "lmroman6-math", {
 
 mathematics.make_font ( "lmroman7-math", {
     { name = "lmroman7-regular.otf", features = "virtualmath", main = true },
- -- { name = "rm-lmr7.tfm", vector = "tex-mr" } ,
+    { name = "rm-lmr7.tfm", vector = "tex-mr" } ,
     { name = "lmmi7.tfm", vector = "tex-mi", skewchar=0x7F },
     { name = "lmsy7.tfm", vector = "tex-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10.tfm", vector = "tex-ex", extension = true } ,
@@ -1402,7 +1402,7 @@ mathematics.make_font ( "lmroman7-math", {
 
 mathematics.make_font ( "lmroman8-math", {
     { name = "lmroman8-regular.otf", features = "virtualmath", main = true },
- -- { name = "rm-lmr8.tfm", vector = "tex-mr" } ,
+    { name = "rm-lmr8.tfm", vector = "tex-mr" } ,
     { name = "lmmi8.tfm", vector = "tex-mi", skewchar=0x7F },
     { name = "lmsy8.tfm", vector = "tex-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10.tfm", vector = "tex-ex", extension = true } ,
@@ -1424,7 +1424,7 @@ mathematics.make_font ( "lmroman8-math", {
 
 mathematics.make_font ( "lmroman9-math", {
     { name = "lmroman9-regular.otf", features = "virtualmath", main = true },
- -- { name = "rm-lmr9.tfm", vector = "tex-mr" } ,
+    { name = "rm-lmr9.tfm", vector = "tex-mr" } ,
     { name = "lmmi9.tfm", vector = "tex-mi", skewchar=0x7F },
     { name = "lmsy9.tfm", vector = "tex-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10.tfm", vector = "tex-ex", extension = true } ,
@@ -1449,7 +1449,7 @@ mathematics.make_font ( "lmroman9-math", {
 
 mathematics.make_font ( "lmroman10-math", {
     { name = "lmroman10-regular.otf", features = "virtualmath", main = true },
- -- { name = "rm-lmr10.tfm", vector = "tex-mr" } ,
+    { name = "rm-lmr10.tfm", vector = "tex-mr" } ,
     { name = "lmmi10.tfm", vector = "tex-mi", skewchar=0x7F },
     { name = "lmsy10.tfm", vector = "tex-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10.tfm", vector = "tex-ex", extension = true } ,
@@ -1466,7 +1466,7 @@ mathematics.make_font ( "lmroman10-math", {
 
 mathematics.make_font ( "lmroman10-boldmath", {
     { name = "lmroman10-bold.otf", features = "virtualmath", main = true },
- -- { name = "rm-lmr10.tfm", vector = "tex-mr" } ,
+    { name = "rm-lmr10.tfm", vector = "tex-mr" } ,
     { name = "lmmib10.tfm", vector = "tex-mi", skewchar=0x7F },
     { name = "lmbsy10.tfm", vector = "tex-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10.tfm", vector = "tex-ex", extension = true } ,
@@ -1488,7 +1488,7 @@ mathematics.make_font ( "lmroman10-boldmath", {
 
 mathematics.make_font ( "lmroman12-math", {
     { name = "lmroman12-regular.otf", features = "virtualmath", main = true },
- -- { name = "rm-lmr12.tfm", vector = "tex-mr" } ,
+    { name = "rm-lmr12.tfm", vector = "tex-mr" } ,
     { name = "lmmi12.tfm", vector = "tex-mi", skewchar=0x7F },
     { name = "lmsy10.tfm", vector = "tex-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10.tfm", vector = "tex-ex", extension = true } ,
@@ -1507,7 +1507,7 @@ mathematics.make_font ( "lmroman12-math", {
 
 mathematics.make_font ( "lmroman17-math", {
     { name = "lmroman17-regular.otf", features = "virtualmath", main = true },
- -- { name = "rm-lmr12.tfm", vector = "tex-mr" } ,
+    { name = "rm-lmr12.tfm", vector = "tex-mr" } ,
     { name = "lmmi12.tfm", vector = "tex-mi", skewchar=0x7F },
     { name = "lmsy10.tfm", vector = "tex-sy", skewchar=0x30, parameters = true } ,
     { name = "lmex10.tfm", vector = "tex-ex", extension = true } ,
@@ -1602,7 +1602,7 @@ mathematics.make_font ( "lucida-math", {
 
 mathematics.make_font ( "charter-math", {
     { name = "file:bchr8a", features = "virtualmath", main = true },
- -- { name = "md-chr7m.tfm", vector = "tex-mr" },
+    { name = "md-chr7m.tfm", vector = "tex-mr" },
     { name = "md-chri7m.tfm", vector = "tex-mi", skewchar=0x7F },
     { name = "md-chr7y.tfm", vector = "tex-sy", skewchar=0x30, parameters = true },
     { name = "md-chr7v.tfm", vector = "tex-ex", extension = true },
