@@ -109,3 +109,18 @@ local function patch(data,filename)
 end
 
 patches["cambria"] = patch
+
+local function patch(data,filename)
+    local m = data.math
+    if m then
+        local d = m.DisplayOperatorMinHeight or 0
+        if d < 1350 then
+            if trace_loading then
+                logs.report("load otf","patching DisplayOperatorMinHeight(%s -> 1350)",d)
+            end
+            m.DisplayOperatorMinHeight = 1350
+        end
+    end
+end
+
+patches["asana"] = patch
