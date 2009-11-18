@@ -371,7 +371,7 @@ function fonts.vf.math.define(specification,set)
                                 if trace_virtual then
                                     logs.report("math virtual", "unicode point U+%05X has no index %04X in vector %s for font %s",unicode,index,vectorname,fontname)
                                 elseif not already_reported then
-                                    logs.report("math virtual", "the mapping is incomplete for '%s' at %s",name,size)
+                                    logs.report("math virtual", "the mapping is incomplete for '%s' at %s",name,number.topoints(size))
                                     already_reported = true
                                 end
                                 rv[unicode] = true
