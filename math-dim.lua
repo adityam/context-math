@@ -21,9 +21,9 @@ local defaults = {
         ['default']={ "AccentBaseHeight", "x_height" },
     },
     ['fraction_del_size']={
-        ['default']={ "0", "delim2" },
-        ['cramped_display_style']={ "0", "delim1" },
-        ['display_style']={ "0", "delim1" },
+        ['default']={ "FractionDelimiterSize", "delim2" },
+        ['cramped_display_style']={ "FractionDelimiterDisplayStyleSize", "delim1" },
+        ['display_style']={ "FractionDelimiterDisplayStyleSize", "delim1" },
      },
     ['fraction_denom_down']={
         ['default']={ "FractionDenominatorShiftDown", "denom2" },
@@ -248,6 +248,7 @@ function mathematics.dimensions(dimens)
             end
             t[variable] = tt
         end
+logs.report("warning", "version 0.47 is needed for proper delimited math")
         local d = {
             AxisHeight                                  = t . axis                  . text_style,
             AccentBaseHeight                            = t . accent_base_height    . text_style,
@@ -260,6 +261,8 @@ function mathematics.dimensions(dimens)
             FractionNumeratorGapMin                     = t . fraction_num_vgap     . text_style,
             FractionNumeratorShiftUp                    = t . fraction_num_up       . text_style,
             FractionRuleThickness                       = t . fraction_rule         . text_style,
+--          FractionDelimiterSize                       = t . fraction_del_size     . text_style,
+--          FractionDelimiterDisplayStyleSize           = t . fraction_del_size     . display_style,
             LowerLimitBaselineDropMin                   = t . limit_below_bgap      . text_style,
             LowerLimitGapMin                            = t . limit_below_vgap      . text_style,
             OverbarExtraAscender                        = t . overbar_kern          . text_style,
