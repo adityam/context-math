@@ -63403,6 +63403,8 @@ characters.data={
   description="MATHEMATICAL LEFT FLATTENED PARENTHESIS"
   direction="on",
   linebreak="op",
+  mathclass="open",
+  mathname="lgroup",
   mirror=0x27EF,
   unicodeslot=0x27EE,
  },
@@ -63412,6 +63414,8 @@ characters.data={
   description="MATHEMATICAL RIGHT FLATTENED PARENTHESIS"
   direction="on",
   linebreak="cl",
+  mathclass="close",
+  mathname="rgroup",
   mirror=0x27EE,
   unicodeslot=0x27EF,
  },
@@ -75730,8 +75734,6 @@ characters.data={
   direction="on",
   linebreak="op",
   mirror=0x3015,
-  mathclass="open",
-  mathname="lgroup",
   unicodeslot=0x3014,
  },
  [0x3015]={
@@ -75741,8 +75743,6 @@ characters.data={
   direction="on",
   linebreak="cl",
   mirror=0x3014,
-  mathclass="close",
-  mathname="rgroup",
   unicodeslot=0x3015,
  },
  [0x3016]={
