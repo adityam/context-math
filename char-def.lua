@@ -63379,6 +63379,42 @@ characters.data={
   mirror=0x27EA,
   unicodeslot=0x27EB,
  },
+ [0x27EC]={
+  category="ps",
+  cjkwd="na",
+  description="MATHEMATICAL LEFT WHITE TORTOISE SHELL BRACKET",
+  direction="on",
+  linebreak="op",
+  mirror=0x27ED,
+  unicodeslot=0x27EC,
+ },
+ [0x27ED]={
+  category="pe",
+  cjkwd="na",
+  description="MATHEMATICAL RIGHT WHITE TORTOISE SHELL BRACKET",
+  direction="on",
+  linebreak="cl",
+  mirror=0x27EC,
+  unicodeslot=0x27ED,
+ },
+ [0x27EE]={
+  category="ps",
+  cjkwd="na",
+  description="MATHEMATICAL LEFT FLATTENED PARENTHESIS"
+  direction="on",
+  linebreak="op",
+  mirror=0x27EF,
+  unicodeslot=0x27EE,
+ },
+ [0x27EF]={
+  category="pe",
+  cjkwd="na",
+  description="MATHEMATICAL RIGHT FLATTENED PARENTHESIS"
+  direction="on",
+  linebreak="cl",
+  mirror=0x27EE,
+  unicodeslot=0x27EF,
+ },
  [0x27F0]={
   category="sm",
   description="UPWARDS QUADRUPLE ARROW",
