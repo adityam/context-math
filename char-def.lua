@@ -51779,6 +51779,8 @@ characters.data={
   description="UP DOWN ARROW WITH BASE",
   direction="on",
   linebreak="al",
+  mathclass="ord",
+  mathname="updownarrowbar",
   unicodeslot=0x21A8,
  },
  [0x21A9]={
@@ -51841,6 +51843,8 @@ characters.data={
   description="DOWNWARDS ZIGZAG ARROW",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="downzigzagarrow",
   unicodeslot=0x21AF,
  },
  [0x21B0]={
@@ -51867,7 +51871,7 @@ characters.data={
   direction="on",
   linebreak="al",
   mathclass="relation",
-  mathname="dlsh", -- from mathabx
+  mathname="Ldsh",
   unicodeslot=0x21B2,
  },
  [0x21B3]={
@@ -51876,7 +51880,7 @@ characters.data={
   direction="on",
   linebreak="al",
   mathclass="relation",
-  mathname="drsh", -- from mathabx
+  mathname="Rdsh", 
   unicodeslot=0x21B3,
  },
  [0x21B4]={
@@ -51884,6 +51888,8 @@ characters.data={
   description="RIGHTWARDS ARROW WITH CORNER DOWNWARDS",
   direction="on",
   linebreak="al",
+  mathclass="ord",
+  mathname="linefeed",
   unicodeslot=0x21B4,
  },
  [0x21B5]={
@@ -51893,6 +51899,8 @@ characters.data={
   description="DOWNWARDS ARROW WITH CORNER LEFTWARDS",
   direction="on",
   linebreak="al",
+  mathclass="ord",
+  mathname="carriagereturn",
   unicodeslot=0x21B5,
  },
  [0x21B6]={
@@ -51919,6 +51927,8 @@ characters.data={
   description="NORTH WEST ARROW TO LONG BAR",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="barovernorthwestarrow",
   unicodeslot=0x21B8,
  },
  [0x21B9]={
@@ -51927,6 +51937,8 @@ characters.data={
   description="LEFTWARDS ARROW TO BAR OVER RIGHTWARDS ARROW TO BAR",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="barleftarrowrightarrowba", -- This is a strange name
   unicodeslot=0x21B9,
  },
  [0x21BA]={
@@ -51934,8 +51946,10 @@ characters.data={
   description="ANTICLOCKWISE OPEN CIRCLE ARROW",
   direction="on",
   linebreak="al",
-  mathclass="relation",
-  mathname="circlearrowright",
+  mathspec = {
+    {class="relation", name="circlearrowright"},
+    {class-"relation", name="acwopencirclearrow"},
+  },
   unicodeslot=0x21BA,
  },
  [0x21BB]={
@@ -51943,8 +51957,10 @@ characters.data={
   description="CLOCKWISE OPEN CIRCLE ARROW",
   direction="on",
   linebreak="al",
-  mathclass="relation",
-  mathname="circlearrowleft",
+  mathspec = {
+    {class="relation", name="circlearrowleft"},
+    {class-"relation", name="cwopencirclearrow"},
+  },
   unicodeslot=0x21BB,
  },
  [0x21BC]={
@@ -52272,6 +52288,8 @@ characters.data={
   description="UPWARDS ARROW WITH DOUBLE STROKE",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="nHuparrow", -- strange name
   unicodeslot=0x21DE,
  },
  [0x21DF]={
@@ -52279,6 +52297,8 @@ characters.data={
   description="DOWNWARDS ARROW WITH DOUBLE STROKE",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="nHdownarrow", -- strange name
   unicodeslot=0x21DF,
  },
  [0x21E0]={
@@ -52287,7 +52307,7 @@ characters.data={
   direction="on",
   linebreak="al",
   mathclass="relation",
-  mathname="dashleftarrow",
+  mathname="leftdasharrow",
   unicodeslot=0x21E0,
  },
  [0x21E1]={
@@ -52296,7 +52316,7 @@ characters.data={
   direction="on",
   linebreak="al",
   mathclass="relation",
-  mathname="dashuparrow",
+  mathname="updasharrow",
   unicodeslot=0x21E1,
  },
  [0x21E2]={
@@ -52305,7 +52325,7 @@ characters.data={
   direction="on",
   linebreak="al",
   mathspec={
-    { class="relation", name="dashrightarrow" } ,
+    { class="relation", name="rightdasharrow" } ,
     { class="relation", name="dasharrow" } ,
   },
   unicodeslot=0x21E2,
@@ -52316,7 +52336,7 @@ characters.data={
   direction="on",
   linebreak="al",
   mathclass="relation",
-  mathname="dashdownarrow",
+  mathname="downdasharrow",
   unicodeslot=0x21E3,
  },
  [0x21E4]={
@@ -52324,6 +52344,8 @@ characters.data={
   description="LEFTWARDS ARROW TO BAR",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="barleftarrow",
   unicodeslot=0x21E4,
  },
  [0x21E5]={
@@ -52331,6 +52353,8 @@ characters.data={
   description="RIGHTWARDS ARROW TO BAR",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="rightarrowbar", 
   unicodeslot=0x21E5,
  },
  [0x21E6]={
@@ -52338,6 +52362,8 @@ characters.data={
   description="LEFTWARDS WHITE ARROW",
   direction="on",
   linebreak="al",
+  mathclass="ord",
+  mathname="leftwhitearrow",
   unicodeslot=0x21E6,
  },
  [0x21E7]={
@@ -52346,6 +52372,8 @@ characters.data={
   description="UPWARDS WHITE ARROW",
   direction="on",
   linebreak="al",
+  mathclass="ord",
+  mathname="upwhitearrow",
   unicodeslot=0x21E7,
  },
  [0x21E8]={
@@ -52353,6 +52381,8 @@ characters.data={
   description="RIGHTWARDS WHITE ARROW",
   direction="on",
   linebreak="al",
+  mathclass="ord",
+  mathname="rightwhitearrow",
   unicodeslot=0x21E8,
  },
  [0x21E9]={
@@ -52360,6 +52390,8 @@ characters.data={
   description="DOWNWARDS WHITE ARROW",
   direction="on",
   linebreak="al",
+  mathclass="ord",
+  mathname="downwhitearrow",
   unicodeslot=0x21E9,
  },
  [0x21EA]={
@@ -52374,6 +52406,8 @@ characters.data={
   description="UPWARDS WHITE ARROW ON PEDESTAL",
   direction="on",
   linebreak="al",
+  mathclass="ord",
+  mathname="whitearrowupfrombar",
   unicodeslot=0x21EB,
  },
  [0x21EC]={
@@ -52437,6 +52471,8 @@ characters.data={
   description="RIGHT ARROW WITH SMALL CIRCLE",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="circleonrightarrow",
   unicodeslot=0x21F4,
  },
  [0x21F5]={
@@ -52444,6 +52480,8 @@ characters.data={
   description="DOWNWARDS ARROW LEFTWARDS OF UPWARDS ARROW",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="downuparrows",
   unicodeslot=0x21F5,
  },
  [0x21F6]={
@@ -52451,6 +52489,8 @@ characters.data={
   description="THREE RIGHTWARDS ARROWS",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="rightthreearrows",
   unicodeslot=0x21F6,
  },
  [0x21F7]={
@@ -52458,6 +52498,8 @@ characters.data={
   description="LEFTWARDS ARROW WITH VERTICAL STROKE",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="nvleftarrow",
   unicodeslot=0x21F7,
  },
  [0x21F8]={
@@ -52465,6 +52507,8 @@ characters.data={
   description="RIGHTWARDS ARROW WITH VERTICAL STROKE",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="nvrightarrow",
   unicodeslot=0x21F8,
  },
  [0x21F9]={
@@ -52472,6 +52516,8 @@ characters.data={
   description="LEFT RIGHT ARROW WITH VERTICAL STROKE",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="nvleftrightarrow",
   unicodeslot=0x21F9,
  },
  [0x21FA]={
@@ -52479,6 +52525,8 @@ characters.data={
   description="LEFTWARDS ARROW WITH DOUBLE VERTICAL STROKE",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="nVleftarrow",
   unicodeslot=0x21FA,
  },
  [0x21FB]={
@@ -52486,6 +52534,8 @@ characters.data={
   description="RIGHTWARDS ARROW WITH DOUBLE VERTICAL STROKE",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="nVrightarrow",
   unicodeslot=0x21FB,
  },
  [0x21FC]={
@@ -52493,6 +52543,8 @@ characters.data={
   description="LEFT RIGHT ARROW WITH DOUBLE VERTICAL STROKE",
   direction="on",
   linebreak="al",
+  mathclass="relation",
+  mathname="nVleftrightarrow",
   unicodeslot=0x21FC,
  },
  [0x21FD]={
