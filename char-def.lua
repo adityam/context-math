@@ -51948,7 +51948,7 @@ characters.data={
   linebreak="al",
   mathspec = {
     {class="relation", name="circlearrowright"},
-    {class-"relation", name="acwopencirclearrow"},
+    {class="relation", name="acwopencirclearrow"},
   },
   unicodeslot=0x21BA,
  },
@@ -51959,7 +51959,7 @@ characters.data={
   linebreak="al",
   mathspec = {
     {class="relation", name="circlearrowleft"},
-    {class-"relation", name="cwopencirclearrow"},
+    {class="relation", name="cwopencirclearrow"},
   },
   unicodeslot=0x21BB,
  },
