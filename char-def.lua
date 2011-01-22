@@ -51880,7 +51880,7 @@ characters.data={
   direction="on",
   linebreak="al",
   mathclass="relation",
-  mathname="Rdsh", 
+  mathname="Rdsh",
   unicodeslot=0x21B3,
  },
  [0x21B4]={
@@ -52354,7 +52354,7 @@ characters.data={
   direction="on",
   linebreak="al",
   mathclass="relation",
-  mathname="rightarrowbar", 
+  mathname="rightarrowbar",
   unicodeslot=0x21E5,
  },
  [0x21E6]={
